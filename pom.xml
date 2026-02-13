@@ -13,6 +13,19 @@
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+    
+    <dependencies>
+        <dependency>
+            <groupId>org.questdb</groupId>
+            <artifactId>questdb</artifactId>
+            <version>8.1.0</version>
+        </dependency>
 
-
+        <dependency>
+            <groupId>com.lmax</groupId>
+            <artifactId>disruptor</artifactId>
+            <version>4.0.0</version>
+        </dependency>
+    </dependencies>
+    
 </project>

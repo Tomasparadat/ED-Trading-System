@@ -1,0 +1,11 @@
+version: '3.8'
+services:
+  questdb:
+    image: questdb/questdb:latest
+    container_name: questdb_trading
+    ports:
+      - "9000:9000" # Web Console (SQL & Charts)
+      - "9009:9009" # InfluxDB Line Protocol (Your AsyncWriter)
+      - "8812:8812" # Postgres Wire Protocol (For Grafana)
+    volumes:
+      - ./questdb_data:/var/lib/questdb # Saves your data in your project folder
