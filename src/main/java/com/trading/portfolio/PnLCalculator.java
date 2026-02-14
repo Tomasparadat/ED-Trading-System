@@ -8,7 +8,7 @@ public class PnLCalculator {
     /**
      * Calculate realized PnL based off Position's realized PnL on it's last trade.
      *
-     * @param pos
+     * @param pos Position being referenced.
      */
     public void calculate(Position pos) {
         this.totalRealizedPnL +=  pos.getLastTradeRealizedPnL();

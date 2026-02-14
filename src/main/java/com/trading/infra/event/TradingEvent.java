@@ -1,7 +1,6 @@
 package com.trading.infra.event;
 
 public class TradingEvent {
-    private long sequence;
     private String symbol;
     private double price;
     private double quantity;
@@ -14,5 +13,17 @@ public class TradingEvent {
 
     public EventType getType() {
         return type;
+    }
+
+    public String getSymbol() {
+        return symbol;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public double getQuantity() {
+        return quantity;
     }
 }
