@@ -19,6 +19,7 @@ public class PositionManager {
     }
 
     /**
+     *  Retrieve X Position from map
      *
      * @param symbol Ticker symbol of traded asset.
      * @return Position with Ticker-Name of symbol parameter.
@@ -27,9 +28,17 @@ public class PositionManager {
         return positions.get(symbol);
     }
 
+    /**
+     * Creates a new Position Object at places it int he Positions Map.
+     * Checks if Quantity and price are above 0.0 in order to not have empty Fills.
+     *
+     * @param symbol Ticker Symbol.
+     * @param quantity Fill Quantity.
+     * @param price Fill Price.
+     */
     public void createNewPosition(String symbol, double quantity, double price){
-        if(quantity < 0.0){ throw new IllegalArgumentException("Quantity must be greater than zero"); }
-        if(price < 0.0){ throw new IllegalArgumentException("Price must be greater than zero"); }
+        if(quantity <= 0.0){ throw new IllegalArgumentException("Quantity must be greater than zero"); }
+        if(price <= 0.0){ throw new IllegalArgumentException("Price must be greater than zero"); }
 
         positions.put(symbol, new Position(symbol, quantity, price));
     }

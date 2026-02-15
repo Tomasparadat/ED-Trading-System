@@ -16,14 +16,12 @@ public class PortfolioTracker implements EventHandler<TradingEvent> {
     }
 
 
-    //TODO: Create test suite for package.
-    //TODO: Update Class diagram for component.
     /**
      * On Event check Fill Type, if sell then call position updateOnFill, add trading event to ledger.
      *
      * @param event Trading Event
      * @param sequence Event ID
-     * @param endOfBatch
+     * @param endOfBatch ..
      */
     @Override
     public void onEvent(TradingEvent event, long sequence, boolean endOfBatch) {

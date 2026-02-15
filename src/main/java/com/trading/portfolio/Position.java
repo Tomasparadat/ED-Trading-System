@@ -9,9 +9,9 @@ public class Position {
     /**
      * Position Constructor.
      *
-     * @param symbol
-     * @param quantity
-     * @param averageEntryPrice
+     * @param symbol Ticker Symbol.
+     * @param quantity Fill Quantity.
+     * @param averageEntryPrice Average Entry Price of Position.
      */
     public Position(String symbol, double quantity, double averageEntryPrice) {
         this.symbol = symbol;
@@ -22,7 +22,7 @@ public class Position {
     /**
      * Return the total market value of the position.
      *
-     * @param currentPrice
+     * @param currentPrice Current Market Price of underlying asset.
      * @return Current market value of position.
      */
     public double getMarketValue(double currentPrice) {
@@ -33,13 +33,12 @@ public class Position {
      * Update position based of Fill (Buy or sell).
      * The method decides whether to sell or buy based off the fillQty, if the fillQty > 0 this signals a purchase,
      * otherwise a sell is being executed.
-     *
      * BUY: Average entry price and position quantity are updated
      * SELL: Prevents Position from going short, if fillQty is greater than Position quantity,
      * then whole Position is sold. PnL and quantity are updated.
      *
-     * @param fillQty
-     * @param fillPrice
+     * @param fillQty Quantity of Position being Sold/Bought.
+     * @param fillPrice Price of Fill.
      */
     public void updateOnFill(double fillQty, double fillPrice) {
         // Check if fill is a buy or sell.
@@ -67,6 +66,7 @@ public class Position {
     }
 
     /**
+     * Return Realized PnL from last Trade.
      *
      * @return realized PnL from last Trade on Position.
      */
