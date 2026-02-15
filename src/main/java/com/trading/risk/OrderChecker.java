@@ -8,6 +8,6 @@ public class OrderChecker implements RiskRule {
 
     @Override
     public RiskResult validate(ProposedOrder order, PortfolioTracker pt) {
-        if(order.getPrice() - )
+        return null;
     }
 }
