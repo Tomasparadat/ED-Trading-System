@@ -1,4 +1,4 @@
-package com.trading.portfolio;
+package com.trading.domain;
 
 public class Position {
     private String symbol;

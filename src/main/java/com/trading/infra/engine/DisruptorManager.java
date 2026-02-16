@@ -11,7 +11,7 @@ public class DisruptorManager  implements TradingEventFactory {
 
     public void start(){}
 
-    public void publish(MarketData data){}
+    public void publish(int data){}
 
     public void shutdown(){}
 

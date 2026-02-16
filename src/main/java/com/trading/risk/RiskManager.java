@@ -22,8 +22,7 @@ public class RiskManager {
         for (RiskRule rule : rules) {
             rule.validate(order, portfolioReference);
         }
-
-
+        throw new UnsupportedOperationException("Not implemented yet");
     }
 
 }

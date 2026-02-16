@@ -1,7 +1,7 @@
 package com.trading.sim;
 
 import com.lmax.disruptor.RingBuffer;
-import com.trading.domain.OrderFill;
+import com.trading.domain.Order;
 import com.trading.infra.event.TradingEvent;
 
 public class EventProducer {
@@ -9,5 +9,5 @@ public class EventProducer {
 
     public void publishPrice(String symbol, double price) {}
 
-    public void publishFill(OrderFill fill){}
+    public void publishFill(Order fill){}
 }
