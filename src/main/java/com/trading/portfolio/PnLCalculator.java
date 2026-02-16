@@ -1,5 +1,6 @@
 package com.trading.portfolio;
 
+import com.trading.domain.Position;
 
 
 public class PnLCalculator {

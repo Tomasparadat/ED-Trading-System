@@ -1,10 +1,11 @@
 package com.trading.portfolio;
 
 import com.lmax.disruptor.EventHandler;
+import com.trading.domain.OrderFill;
+import com.trading.domain.Position;
 import com.trading.infra.event.EventType;
-import com.trading.infra.event.TradingEvent;
 
-public class PortfolioTracker implements EventHandler<TradingEvent> {
+public class PortfolioTracker implements EventHandler<OrderFill> {
     private PositionManager posManager;
     private PnLCalculator pnlCalc;
     private Ledger ledger;
@@ -19,25 +20,22 @@ public class PortfolioTracker implements EventHandler<TradingEvent> {
     /**
      * On Event check Fill Type, if sell then call position updateOnFill, add trading event to ledger.
      *
-     * @param event Trading Event
+     * @param order Trading Event
      * @param sequence Event ID
      * @param endOfBatch ..
      */
     @Override
-    public void onEvent(TradingEvent event, long sequence, boolean endOfBatch) {
-        if (event.getType() != EventType.ORDER_FILL) {
-            return;
-        }
+    public void onEvent(OrderFill order, long sequence, boolean endOfBatch) {
 
-        Position pos = posManager.getPosition(event.getSymbol());
+        Position pos = posManager.getPosition(order.symbol());
 
         if (pos == null) {
-            posManager.createNewPosition(event.getSymbol(), event.getQuantity(), event.getPrice());
+            posManager.createNewPosition(order.symbol(), order.quantity(), order.price());
         } else {
-            pos.updateOnFill(event.getPrice(), event.getQuantity());
+            pos.updateOnFill(order.price(), order.quantity());
         }
 
         pnlCalc.calculate(pos);
-        ledger.recordTrade(event, sequence);
+        ledger.recordTrade(order, sequence);
     }
 }

@@ -1,6 +1,8 @@
 package com.trading.portfolio;
 
 import com.lmax.disruptor.EventHandler;
+import com.trading.domain.OrderFill;
+import com.trading.domain.Position;
 import com.trading.infra.event.EventType;
 import com.trading.infra.event.TradingEvent;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,7 +28,7 @@ class PortfolioTrackerTest {
     private Ledger mockLedger;
 
     @Mock
-    private TradingEvent mockTradingEvent;
+    private OrderFill mockTradingEvent;
 
     @Mock
     private Position mockPosition;

@@ -1,7 +1,7 @@
 package com.trading.portfolio;
 
 import java.util.Map;
-import com.trading.portfolio.Position;
+import com.trading.domain.Position;
 
 public class PositionManager {
     private static Map<String, Position> positions;

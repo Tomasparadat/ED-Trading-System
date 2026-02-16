@@ -6,7 +6,7 @@ public record ValidatedOrder(
         String strategyId,
         String symbol,
         Side side,
-        long quantity,
+        double quantity,
         double price,
         long timestamp
 ) implements Order {}

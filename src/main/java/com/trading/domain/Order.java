@@ -1,9 +1,9 @@
 package com.trading.domain;
 
-public sealed interface Order permits ProposedOrder, ValidatedOrder {
+public sealed interface Order permits OrderFill, ProposedOrder, ValidatedOrder {
     String symbol();
     String orderId();
-    long quantity();
+    double quantity();
     double price();
     long timestamp();
     Side side();

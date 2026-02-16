@@ -1,5 +1,6 @@
 package com.trading.portfolio;
 
+import com.trading.domain.Position;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;

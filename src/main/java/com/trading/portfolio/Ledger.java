@@ -1,6 +1,6 @@
 package com.trading.portfolio;
 
-import com.trading.infra.event.TradingEvent;
+import com.trading.domain.OrderFill;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,10 +13,10 @@ public class Ledger {
      * This prevents Mutation Bugs since the Disruptor re-uses Memory addresses which can lead to multiple trades
      * having the same address (sequence).
      *
-     * @param fill Trading Event
+     * @param order Trading Event
      * @param sequence Trading Event ID
      */
-    public void recordTrade(TradingEvent fill, long sequence){
-        tradeHistory.add(new LedgerRecord(sequence, fill));
+    public void recordTrade(OrderFill order, long sequence){
+        tradeHistory.add(new LedgerRecord(sequence, order));
     }
 }
