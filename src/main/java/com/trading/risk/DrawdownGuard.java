@@ -1,6 +1,6 @@
 package com.trading.risk;
 
-import com.trading.domain.ProposedOrder;
+import com.trading.infra.event.TradingEvent;
 import com.trading.portfolio.PortfolioTracker;
 
 public class DrawdownGuard implements RiskRule{
@@ -11,7 +11,7 @@ public class DrawdownGuard implements RiskRule{
     }
 
     @Override
-    public RiskResult validate(ProposedOrder order, PortfolioTracker pt) {
+    public RiskResult validate(TradingEvent order, PortfolioTracker pt) {
         return null;
     }
 }

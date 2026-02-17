@@ -1,14 +1,15 @@
 package com.trading.strategy;
 
-import com.trading.handlers.EventHandler;
 import com.trading.infra.event.TradingEvent;
 
-public class StrategyEngine implements EventHandler {
+public class StrategyEngine {
     private IndicatorCalculator indicatorCalc;
     private SignalGenerator signalGen;
     private ExecutionClient executionClient;
 
-    public void onEvent(TradingEvent event) {
-
+    public boolean process(TradingEvent event) {
+        // Placeholder
+        // TODO: Implement method with basic strategy to test functionality.
+        return false;
     }
 }

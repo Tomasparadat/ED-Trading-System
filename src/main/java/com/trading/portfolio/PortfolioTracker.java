@@ -1,11 +1,10 @@
 package com.trading.portfolio;
 
 import com.lmax.disruptor.EventHandler;
-import com.trading.domain.OrderFill;
 import com.trading.domain.Position;
-import com.trading.infra.event.EventType;
+import com.trading.infra.event.TradingEvent;
 
-public class PortfolioTracker implements EventHandler<OrderFill> {
+public class PortfolioTracker implements EventHandler<TradingEvent> {
     private PositionManager posManager;
     private PnLCalculator pnlCalc;
     private Ledger ledger;
@@ -25,14 +24,14 @@ public class PortfolioTracker implements EventHandler<OrderFill> {
      * @param endOfBatch ..
      */
     @Override
-    public void onEvent(OrderFill order, long sequence, boolean endOfBatch) {
+    public void onEvent(TradingEvent order, long sequence, boolean endOfBatch) {
 
-        Position pos = posManager.getPosition(order.symbol());
+        Position pos = posManager.getPosition(order.getSymbol());
 
         if (pos == null) {
-            posManager.createNewPosition(order.symbol(), order.quantity(), order.price());
+            posManager.createNewPosition(order.getSymbol(), order.getQuantity(), order.getPrice());
         } else {
-            pos.updateOnFill(order.price(), order.quantity());
+            pos.updateOnFill(order.getPrice(), order.getQuantity());
         }
 
         pnlCalc.calculate(pos);

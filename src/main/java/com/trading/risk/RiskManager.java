@@ -1,12 +1,10 @@
 package com.trading.risk;
 
-import com.trading.domain.ProposedOrder;
+import com.trading.infra.event.TradingEvent;
 import com.trading.portfolio.PortfolioTracker;
 
 import java.util.*;
 import java.util.ArrayList;
-
-import static com.trading.risk.RiskResult.PASSED;
 
 public class RiskManager {
     private List<RiskRule> rules = new ArrayList<>() {{
@@ -16,8 +14,10 @@ public class RiskManager {
     }};
     private PortfolioTracker portfolioReference;
 
-    public RiskResult checkOrder(ProposedOrder order) {
-
+    public boolean evaluateOrder(TradingEvent order) {
+        //TODO: Implement correctly to check agains rule list.
+        //TODO: Fix method to catch errors
+        //TODO: Fix method to return boolean according to approve or reject.
 
         for (RiskRule rule : rules) {
             rule.validate(order, portfolioReference);

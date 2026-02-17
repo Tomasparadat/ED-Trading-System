@@ -1,5 +1,23 @@
 package com.trading.handlers;
 
-public class DbLoggerHandler extends BaseHandler{
-//    private QuestDBWriter writer;
+import com.lmax.disruptor.EventHandler;
+import com.trading.infra.event.EventType;
+import com.trading.infra.event.TradingEvent;
+
+public class DbLoggerHandler implements EventHandler<TradingEvent> {
+//    private final QuestDBWriter writer;
+
+
+    @Override
+    public void onEvent(TradingEvent event, long l, boolean b) throws Exception {
+        if(event.getType() != EventType.ORDER_FILL) {
+            return;
+        }
+
+        // Write to QuestDB
+        // For now: just a println so you can see it working
+        System.out.println(event.getType() + " " + event.getOrderId() + " " + event.getSymbol());
+        // Replace with writer.write(event) when DB is ready
+    }
+
 }

@@ -6,6 +6,8 @@ import com.trading.domain.Position;
 public class PnLCalculator {
     private double totalRealizedPnL;
 
+
+
     /**
      * Calculate realized PnL based off Position's realized PnL on it's last trade.
      *

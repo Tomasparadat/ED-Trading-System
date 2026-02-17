@@ -1,5 +1,10 @@
 package com.trading.infra.event;
 
-public interface TradingEventFactory {
-    public TradingEvent newInstance();
+import com.lmax.disruptor.EventFactory;
+
+public class TradingEventFactory implements EventFactory<TradingEvent> {
+    @Override
+    public TradingEvent newInstance() {
+        return new TradingEvent();
+    }
 }
