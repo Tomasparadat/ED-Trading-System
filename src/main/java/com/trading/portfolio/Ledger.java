@@ -1,5 +1,6 @@
 package com.trading.portfolio;
 
+import com.trading.domain.EventType;
 import com.trading.infra.event.TradingEvent;
 
 import java.util.ArrayList;
@@ -17,6 +18,11 @@ public class Ledger {
      * @param sequence Trading Event ID
      */
     public void recordTrade(TradingEvent order, long sequence){
+       //TODO: Check error handling.
+        if(order.getType() != EventType.ORDER_FILL) {
+            return;
+        }
+
         tradeHistory.add(new LedgerRecord(sequence, order));
     }
 }

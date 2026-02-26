@@ -16,15 +16,15 @@ public class Main {
     public static void main(String[] args) throws InterruptedException {
 
         // Create domain classes
-        StrategyEngine strategyEngine   = new StrategyEngine();
-        RiskManager riskManager         = new RiskManager();
+        StrategyEngine strategyEngine = new StrategyEngine();
+        RiskManager riskManager = new RiskManager();
         PortfolioTracker portfolioTracker = new PortfolioTracker();
 
         // Create handlers, inject domain classes
-        StrategyHandler strategyHandler   = new StrategyHandler(strategyEngine);
-        RiskHandler riskHandler           = new RiskHandler(riskManager);
+        StrategyHandler strategyHandler = new StrategyHandler(strategyEngine);
+        RiskHandler riskHandler = new RiskHandler(riskManager);
         PortfolioHandler portfolioHandler = new PortfolioHandler(portfolioTracker);
-        DbLoggerHandler dbLoggerHandler   = new DbLoggerHandler();
+        DbLoggerHandler dbLoggerHandler = new DbLoggerHandler();
 
         //  Create and start DisruptorManager
         DisruptorManager disruptor = new DisruptorManager(

@@ -37,8 +37,8 @@ public class PositionManager {
      * @param price Fill Price.
      */
     public void createNewPosition(String symbol, double quantity, double price){
-        if(quantity <= 0.0){ throw new IllegalArgumentException("Quantity must be greater than zero"); }
-        if(price <= 0.0){ throw new IllegalArgumentException("Price must be greater than zero"); }
+        if(quantity <= 0.0){ return; }
+        if(price <= 0.0){ return; }
 
         positions.put(symbol, new Position(symbol, quantity, price));
     }

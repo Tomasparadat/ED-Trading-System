@@ -1,12 +1,13 @@
 package com.trading.handlers;
 
 import com.lmax.disruptor.EventHandler;
-import com.trading.infra.event.EventType;
+import com.trading.domain.EventType;
 import com.trading.infra.event.TradingEvent;
 import com.trading.strategy.StrategyEngine;
 
 public class StrategyHandler implements EventHandler<TradingEvent> {
     private final StrategyEngine engine;
+    private static long ORDER_ID_ORIGIN = 0;
 
     public StrategyHandler(StrategyEngine engine) {
         this.engine = engine;
@@ -34,6 +35,14 @@ public class StrategyHandler implements EventHandler<TradingEvent> {
         // So it can be picked up by the RiskManager off the Buffer.
         if(approved) {
             event.setType(EventType.ORDER_PROPOSED);
+            event.setOrderId(generateOrderId());
+            event.setStrategyId(engine.getStrategyId());
+            event.setQuantity(engine.getProposedQuantity());
+            event.setSide(engine.getProposedSide());
         }
+    }
+
+    private long generateOrderId() {
+        return ORDER_ID_ORIGIN++;
     }
 }

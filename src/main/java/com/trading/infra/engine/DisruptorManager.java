@@ -3,7 +3,7 @@ package com.trading.infra.engine;
 import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.util.DaemonThreadFactory;
-import com.trading.domain.Side;
+import com.trading.domain.EventType;
 import com.trading.handlers.DbLoggerHandler;
 import com.trading.handlers.PortfolioHandler;
 import com.trading.handlers.RiskHandler;
@@ -38,7 +38,7 @@ public class DisruptorManager {
     public void start(){
         disruptor = new Disruptor<>(
                 // Check if not use factory.
-                TradingEvent::new,
+                new TradingEventFactory(),
                 BUFFER_SIZE,
                 DaemonThreadFactory.INSTANCE
         );
@@ -50,22 +50,19 @@ public class DisruptorManager {
         ringBuffer = disruptor.start();
     }
 
-    public void publish(TradingEvent event, String symbol, double price, double quantity, Side side){
+    public void publish(EventType type, String symbol, double price, long timestamp) {
         // Claim sequence number.
         long sequence =  ringBuffer.next();
 
         try {
-            TradingEvent oldEvent = ringBuffer.get(sequence);
+            // Get used object from RingBuffer to recycle.
+            TradingEvent event = ringBuffer.get(sequence);
 
-            // Clear Object to re-use.
+            // Clear Object fields.
             event.clear();
 
             //Re-populate Object with new fields.
-            event.set(event.getOrderId(), event.getStrategyId(),
-                    event.getSide(), event.getSymbol(),
-                    event.getPrice(), event.getPrice(),
-                    event.getType(), event.getTimestamp());
-
+            event.set(type, symbol, price, timestamp);
         } finally {
             // Always publish refurbished Object. finally prevents stalls.
             ringBuffer.publish(sequence);

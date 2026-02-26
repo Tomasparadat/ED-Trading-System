@@ -8,13 +8,13 @@ import com.trading.infra.event.TradingEvent;
  */
 public class LedgerRecord {
     private final long sequence;
-    private final String symbol;
+    private final int symbol;
     private final double quantity;
     private final double price;
 
     public LedgerRecord(long sequence, TradingEvent order) {
         this.sequence = sequence;
-        this.symbol = order.getSymbol();
+        this.symbol = order.getSymbolId();
         this.quantity = order.getQuantity();
         this.price = order.getPrice();
     }

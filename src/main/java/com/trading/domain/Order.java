@@ -1,6 +1,6 @@
 package com.trading.domain;
 
-public sealed interface Order permits ValidatedOrder {
+public interface Order {
     String symbol();
     String orderId();
     double quantity();

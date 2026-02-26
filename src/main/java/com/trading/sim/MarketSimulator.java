@@ -1,20 +1,30 @@
 package com.trading.sim;
 
-import com.lmax.disruptor.dsl.Disruptor;
+import com.lmax.disruptor.EventHandler;
 import com.trading.api.MarketDataProvider;
-import com.trading.domain.ValidatedOrder;
 import com.trading.infra.engine.DisruptorManager;
 import com.trading.infra.event.TradingEvent;
 
-public class MarketSimulator implements MarketDataProvider {
-    private final DisruptorManager disruptor;
+import java.util.List;
 
-    public MarketSimulator(DisruptorManager disruptor) {
+public class MarketSimulator implements MarketDataProvider, EventHandler<TradingEvent> {
+    private final DisruptorManager disruptor;
+    private final List<String> tickerList;
+    private final SymbolRegistry symbolRegistry;
+    private final PriceGenerator priceGenerator;
+    private final OrderMatcher orderMatcher;
+
+
+    public MarketSimulator(DisruptorManager disruptor, List<String> tickerList) {
         this.disruptor = disruptor;
+        this.tickerList = tickerList;
+        this.symbolRegistry = new SymbolRegistry(tickerList);
+        this.priceGenerator = new PriceGenerator(symbolRegistry);
+        this.orderMatcher = new OrderMatcher(symbolRegistry);
     }
 
 
-    public void onValidateOrder(ValidatedOrder event) {
+    public void onValidateOrder(TradingEvent event) {
 
     }
 
@@ -28,6 +38,8 @@ public class MarketSimulator implements MarketDataProvider {
 
     }
 
+    @Override
+    public void onEvent(TradingEvent event, long sequence, boolean endOfBatch) throws Exception {
 
-
+    }
 }

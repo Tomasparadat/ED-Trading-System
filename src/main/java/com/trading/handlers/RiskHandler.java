@@ -1,7 +1,7 @@
 package com.trading.handlers;
 
 import com.lmax.disruptor.EventHandler;
-import com.trading.infra.event.EventType;
+import com.trading.domain.EventType;
 import com.trading.infra.event.TradingEvent;
 import com.trading.risk.RiskManager;
 
@@ -14,13 +14,12 @@ public class RiskHandler implements EventHandler<TradingEvent> {
 
     /**
      *
-     * @param event
-     * @param endOfBatch
-     * @param sequence
-     * @throws Exception
+     * @param event TradingEvent being evaluated and previously approved by StrategyEngine
+     * @param endOfBatch ignore.
+     * @param sequence TradingEvent ID, inside RingBuffer.
      */
     @Override
-    public void onEvent(TradingEvent event, long sequence, boolean endOfBatch) throws Exception {
+    public void onEvent(TradingEvent event, long sequence, boolean endOfBatch) {
         if(event.getType() != EventType.ORDER_PROPOSED) {
             return;
         }
