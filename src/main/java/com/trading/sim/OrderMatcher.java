@@ -94,7 +94,6 @@ public class OrderMatcher {
     }
 
 
-
     /**
      * Create OpenOrder Record to persist in book map. This prevents losing the data to the Ring-Buffer when it recycles
      * the TradingEvent Object. If the book is absent, the method creates a new ArrayList where it adds the

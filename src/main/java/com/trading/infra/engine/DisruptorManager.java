@@ -10,6 +10,7 @@ import com.trading.handlers.RiskHandler;
 import com.trading.handlers.StrategyHandler;
 import com.trading.infra.event.TradingEvent;
 import com.trading.infra.event.TradingEventFactory;
+import com.trading.sim.EventProducer;
 
 public class DisruptorManager {
     private static final int BUFFER_SIZE = 1024;
@@ -50,7 +51,7 @@ public class DisruptorManager {
         ringBuffer = disruptor.start();
     }
 
-    public void publish(EventType type, String symbol, double price, long timestamp) {
+    public void publish(EventType type, int symbolId, double price, long timestamp) {
         // Claim sequence number.
         long sequence =  ringBuffer.next();
 
@@ -62,7 +63,7 @@ public class DisruptorManager {
             event.clear();
 
             //Re-populate Object with new fields.
-            event.set(type, symbol, price, timestamp);
+            event.set(type, symbolId, price, timestamp);
         } finally {
             // Always publish refurbished Object. finally prevents stalls.
             ringBuffer.publish(sequence);
@@ -71,5 +72,13 @@ public class DisruptorManager {
 
     public void shutdown(){
         disruptor.shutdown();
+    }
+
+    public EventProducer getProducer() {
+        return;
+    }
+
+    public RingBuffer<TradingEvent> getRingBuffer() {
+        return ringBuffer;
     }
 }

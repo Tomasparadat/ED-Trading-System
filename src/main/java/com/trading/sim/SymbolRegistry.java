@@ -35,6 +35,7 @@ public class SymbolRegistry {
      * Used at the "Edge" when receiving external orders or starting the sim.
      * @return The unique int ID (e.g., "BTC" -> 1)
      */
+    // TODO: Usage for DB persistence.
     public int getSymbolId(String symbol) {
         //TODO: Not forget to catch -1 error in MarketSimulator.
         return IntStream.range(0, symbols.length)

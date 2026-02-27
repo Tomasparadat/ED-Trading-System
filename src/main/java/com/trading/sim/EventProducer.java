@@ -18,11 +18,10 @@ public class EventProducer {
     /**
      * Claims next slot in the RingBuffer, clears it, resets EventType and sets new Ticker, price and TimeStamp.
      *
-     * @param symbol new Ticker given to the TradingEvent.
+     * @param symbolId new Ticker given to the TradingEvent.
      * @param price new Price passed to TradingEvent.
      */
-    public void publish(String symbol, double price) {
-        int symbolId = symbolRegistry.getSymbolId(symbol);
+    public void publish(int symbolId, double price) {
         long sequence = ringBuffer.next();
         try {
             TradingEvent event = ringBuffer.get(sequence);
