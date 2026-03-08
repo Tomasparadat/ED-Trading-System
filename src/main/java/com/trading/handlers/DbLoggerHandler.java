@@ -1,7 +1,7 @@
 package com.trading.handlers;
 
 import com.lmax.disruptor.EventHandler;
-import com.trading.infra.event.EventType;
+import com.trading.domain.EventType;
 import com.trading.infra.event.TradingEvent;
 
 public class DbLoggerHandler implements EventHandler<TradingEvent> {
@@ -16,7 +16,7 @@ public class DbLoggerHandler implements EventHandler<TradingEvent> {
 
         // Write to QuestDB
         // For now: just a println so you can see it working
-        System.out.println(event.getType() + " " + event.getOrderId() + " " + event.getSymbol());
+        System.out.println(event.getType() + " " + event.getOrderId() + " " + event.getSymbolId());
         // Replace with writer.write(event) when DB is ready
     }
 

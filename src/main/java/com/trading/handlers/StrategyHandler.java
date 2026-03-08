@@ -5,34 +5,33 @@ import com.trading.domain.EventType;
 import com.trading.infra.event.TradingEvent;
 import com.trading.strategy.StrategyEngine;
 
+import java.util.concurrent.atomic.AtomicLong;
+
 public class StrategyHandler implements EventHandler<TradingEvent> {
     private final StrategyEngine engine;
-    private static long ORDER_ID_ORIGIN = 0;
+    private AtomicLong ORDER_ID_ORIGIN = new AtomicLong();
 
     public StrategyHandler(StrategyEngine engine) {
         this.engine = engine;
     }
 
     /**
-     *
+     * Receives a TradingEvent, checks if it's a MarketTick, passes the Event to the StrategyEngine in order
+     * to approve or reject it, once approved it updates the TradingEvent so it can be picked up by the RiskManager.
      *
      * @param event Passed TradingEvent that is evaluated.
-     * @param sequence ignored, it's necessary for EventHandler interface implementation.
-     * @param endOfBatch ignored, it's necessary for EventHandler interface implementation.
+     * @param sequence -
+     * @param endOfBatch -
      */
     @Override
     public void onEvent(TradingEvent event, long sequence, boolean endOfBatch) {
 
-        // Only accept MARKET_TICK, otherwise reject.
         if (event.getType() != EventType.MARKET_TICK) {
             return;
         }
 
-        // Engine approves strategy internally.
-        boolean approved = engine.process(event);
+        boolean approved = engine.processTrade(event);
 
-        // If the engine approves the trade, it's type is updated to ORDER_PROPOSED
-        // So it can be picked up by the RiskManager off the Buffer.
         if(approved) {
             event.setType(EventType.ORDER_PROPOSED);
             event.setOrderId(generateOrderId());
@@ -42,7 +41,8 @@ public class StrategyHandler implements EventHandler<TradingEvent> {
         }
     }
 
+
     private long generateOrderId() {
-        return ORDER_ID_ORIGIN++;
+        return ORDER_ID_ORIGIN.incrementAndGet();
     }
 }

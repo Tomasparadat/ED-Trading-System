@@ -3,26 +3,28 @@ package com.trading.risk;
 import com.trading.infra.event.TradingEvent;
 import com.trading.portfolio.PortfolioTracker;
 
-import java.util.*;
 import java.util.ArrayList;
+import java.util.List;
 
 public class RiskManager {
-    private List<RiskRule> rules = new ArrayList<>() {{
-        add(new OrderChecker());
-        add(new PositionLimitChecker());
-        add(new DrawdownGuard());
-    }};
-    private PortfolioTracker portfolioReference;
+    private final List<RiskRule> rules;
+    private final PortfolioTracker portfolioReference;
 
-    public boolean evaluateOrder(TradingEvent order) {
-        //TODO: Implement correctly to check agains rule list.
-        //TODO: Fix method to catch errors
-        //TODO: Fix method to return boolean according to approve or reject.
-
-        for (RiskRule rule : rules) {
-            rule.validate(order, portfolioReference);
-        }
-        throw new UnsupportedOperationException("Not implemented yet");
+    public RiskManager(PortfolioTracker portfolioTracker, double[] lastKnownPrices) {
+        this.portfolioReference = portfolioTracker;
+        this.rules = new ArrayList<>();
+        this.rules.add(new OrderChecker(lastKnownPrices));
+        this.rules.add(new PositionLimitChecker());
+        this.rules.add(new DrawdownGuard());
     }
 
+    public boolean evaluateOrder(TradingEvent order) {
+        for (RiskRule rule : rules) {
+            RiskResult result = rule.validate(order, portfolioReference);
+            if (result != RiskResult.PASSED) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

@@ -25,16 +25,30 @@ public class PortfolioTracker implements EventHandler<TradingEvent> {
      */
     @Override
     public void onEvent(TradingEvent order, long sequence, boolean endOfBatch) {
-
-        Position pos = posManager.getPosition(order.getSymbol());
+        Position pos = posManager.getPosition(order.getSymbolId());
 
         if (pos == null) {
-            posManager.createNewPosition(order.getSymbol(), order.getQuantity(), order.getPrice());
-        } else {
-            pos.updateOnFill(order.getPrice(), order.getQuantity());
+            posManager.createNewPosition(order.getSymbolId(), order.getQuantity(), order.getPrice());
+            pos = posManager.getPosition(order.getSymbolId());
         }
-
+        pos.updateOnFill(order.getQuantity(), order.getPrice());
         pnlCalc.calculate(pos);
+
         ledger.recordTrade(order, sequence);
+    }
+
+    /**
+     * Return current Quantity being held for Position with symbolId of Parameter.
+     *
+     * @param symbolId Ticker Symbol of queried Position.
+     * @return Quantity being held.
+     */
+    public double getPositionQuantity(int symbolId) {
+        Position pos = posManager.getPosition(symbolId);
+        return pos != null ? pos.getQuantity() : 0.0;
+    }
+
+    public double getTotalRealizedPnL() {
+        return pnlCalc.getTotalRealizedPnL();
     }
 }

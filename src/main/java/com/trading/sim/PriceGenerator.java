@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.Random;
 
 public class PriceGenerator {
-    private static final double VOLATILITY = 0.25;
+    private static final double VOLATILITY = 0.005;
     private static final double STARTING_PRICE = 100.00;
     private double[]  priceList;
     private final Random random = new Random();
@@ -21,10 +21,8 @@ public class PriceGenerator {
      */
     public double nextPrice(int symbolId) {
         double oldPrice = priceList[symbolId];
-
         double change = oldPrice * (random.nextGaussian() * VOLATILITY);
-        double newPrice = oldPrice + change;
-
+        double newPrice = Math.max(0.01, oldPrice + change);
         priceList[symbolId] = newPrice;
 
         return newPrice;

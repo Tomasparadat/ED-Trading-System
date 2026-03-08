@@ -1,7 +1,7 @@
 package com.trading.handlers;
 
 import com.lmax.disruptor.EventHandler;
-import com.trading.infra.event.EventType;
+import com.trading.domain.EventType;
 import com.trading.infra.event.TradingEvent;
 import com.trading.portfolio.PortfolioTracker;
 
@@ -17,6 +17,5 @@ public class PortfolioHandler implements EventHandler<TradingEvent> {
         if(event.getType() == EventType.ORDER_FILL){
         tracker.onEvent(event, sequence, endOfBatch);
         } else return;
-
     }
 }

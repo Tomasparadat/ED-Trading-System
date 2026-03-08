@@ -20,9 +20,10 @@ public class TradingEvent {
      * @param type MARKET_TICK, ORDER_PROPOSED, ORDER_FILL, ORDER_VALIDATED
      * @param symbolId Stock ticker symbol
      * @param price asset price
-     * @param timestamp
+     * @param timestamp Time of order execution
      */
     public void set(EventType type, int symbolId, double price, long timestamp) {
+        clear();
         this.symbolId = symbolId;
         this.price = price;
         this.timestamp = timestamp;

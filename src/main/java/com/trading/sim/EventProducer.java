@@ -25,8 +25,7 @@ public class EventProducer {
         long sequence = ringBuffer.next();
         try {
             TradingEvent event = ringBuffer.get(sequence);
-            event.clear();
-            event.set(EventType.MARKET_TICK, symbolId, price, System.currentTimeMillis());
+            event.set(EventType.MARKET_TICK, symbolId, price, System.currentTimeMillis()); // clear happens inside
         } finally {
             ringBuffer.publish(sequence);
         }

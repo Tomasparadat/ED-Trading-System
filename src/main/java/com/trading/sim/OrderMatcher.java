@@ -9,17 +9,18 @@ import java.util.*;
 public class OrderMatcher {
     private final double[] lastKnownPrices;
     private final SymbolRegistry registry;
-    private final Map<Integer, List<OpenOrder>> book = new HashMap<>();
+    private final List<OpenOrder>[] book;
     private record OpenOrder(long orderId, int symbolId, double price, double quantity, Side side) {}
 
-    /**
-     * OrderMatcher constructor
-     *
-     * @param registry SymbolRegistry where all Ticker symbols that live in this instance of the market are stored.
-     */
+    @SuppressWarnings("unchecked")
     public OrderMatcher(SymbolRegistry registry) {
         this.registry = registry;
         this.lastKnownPrices = new double[registry.size()];
+        this.book = new List[registry.size()];
+
+        for (int i = 0; i < registry.size(); i++) {
+            book[i] = new ArrayList<>();
+        }
     }
 
     /**
@@ -46,30 +47,27 @@ public class OrderMatcher {
         double currentPrice = tick.getPrice();
         lastKnownPrices[id] = currentPrice;
 
-        List<OpenOrder> orders = book.get(id);
-        if (orders == null || orders.isEmpty()) return;
-
+        List<OpenOrder> orders = book[id];
+        if (orders.isEmpty()) return;  // null check no longer needed
 
         Iterator<OpenOrder> iterator = orders.iterator();
         while (iterator.hasNext()) {
             OpenOrder order = iterator.next();
-
             if (isMatch(order, currentPrice)) {
                 applyFill(tick, order);
-
                 iterator.remove();
-                return;
+                return; // see Bug 1 note above
             }
         }
-    }
 
-    /**
-     * Updates TradingEvent attributes. transforming it into a ORDER_FILL and passing the orderId, price and quantity
-     * as it's new values.
-     *
-     * @param event TradingEvent Object being recycled.
-     * @param order OpenOrder being matched.
-     */
+
+        /**
+         * Updates TradingEvent attributes. transforming it into a ORDER_FILL and passing the orderId, price and quantity
+         * as it's new values.
+         *
+         * @param event TradingEvent Object being recycled.
+         * @param order OpenOrder being matched.
+         */
     private void applyFill(TradingEvent event, OpenOrder order) {
         event.setType(EventType.ORDER_FILL);
         event.setOrderId(order.orderId());
@@ -111,6 +109,8 @@ public class OrderMatcher {
                 event.getSide()
         );
 
-        book.computeIfAbsent(persistentOrder.symbolId(), k -> new ArrayList<>()).add(persistentOrder);
+        book[persistentOrder.symbolId()].add(persistentOrder);
     }
+
+    public double[] getLastKnownPrices() { return lastKnownPrices; }
 }

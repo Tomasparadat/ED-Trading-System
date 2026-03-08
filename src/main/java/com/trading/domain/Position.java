@@ -1,7 +1,7 @@
 package com.trading.domain;
 
 public class Position {
-    private String symbol;
+    private int symbolId;
     private double quantity;
     private double averageEntryPrice;
     private double lastTradeRealizedPnL;
@@ -9,12 +9,12 @@ public class Position {
     /**
      * Position Constructor.
      *
-     * @param symbol Ticker Symbol.
+     * @param symbolId Ticker Symbol.
      * @param quantity Fill Quantity.
      * @param averageEntryPrice Average Entry Price of Position.
      */
-    public Position(String symbol, double quantity, double averageEntryPrice) {
-        this.symbol = symbol;
+    public Position(int symbolId, double quantity, double averageEntryPrice) {
+        this.symbolId = symbolId;
         this.quantity = quantity;
         this.averageEntryPrice = averageEntryPrice;
     }
@@ -66,12 +66,27 @@ public class Position {
     }
 
     /**
-     * Return Realized PnL from last Trade.
-     *
      * @return realized PnL from last Trade on Position.
      */
     public double getLastTradeRealizedPnL() {
         return lastTradeRealizedPnL;
     }
 
+   public int getSymbolId() {
+        return symbolId;
+   }
+
+   public double getQuantity() {
+        return quantity;
+   }
+
+    /**
+     * Returns the realized PnL from the last trade and resets it to 0.
+     * Prevents double-counting if calculate() is called on a BUY event.
+     */
+    public double consumeLastTradeRealizedPnL() {
+        double pnl = this.lastTradeRealizedPnL;
+        this.lastTradeRealizedPnL = 0;
+        return pnl;
+    }
 }
