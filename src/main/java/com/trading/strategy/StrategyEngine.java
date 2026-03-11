@@ -9,7 +9,7 @@ import com.trading.infra.event.TradingEvent;
  * and stores the decision for StrategyHandler to read.
  */
 public class StrategyEngine {
-    private static final int STRATEGY_ID      = 1;
+    private static final int STRATEGY_ID = 1;
     private static final double DEFAULT_QUANTITY = 10.0;
 
     private final IndicatorCalculator[] indicators;
@@ -21,8 +21,7 @@ public class StrategyEngine {
      * Constructs a StrategyEngine with independant SMA indicator per symbol.
      * @param fastPeriod No. of ticks for the fast SMA window.
      * @param slowPeriod No. of ticks for the slow SMA window
-     * @param symbolCount Total No. of symbols from SymbolRegistry, used to
-     *                    size the indicator and signal arrays.
+     * @param symbolCount Total No. of symbols from SymbolRegistry, used to size the indicator and signal arrays.
      */
     public StrategyEngine(int fastPeriod, int slowPeriod, int symbolCount) {
         this.indicators = new IndicatorCalculator[symbolCount];
@@ -51,7 +50,7 @@ public class StrategyEngine {
         switch (type) {
             case BUY -> { proposedSide = Side.BUY;  return true; }
             case SELL -> { proposedSide = Side.SELL; return true; }
-            default -> { proposedSide = null;      return false; }
+            default -> { proposedSide = null; return false; }
         }
     }
 

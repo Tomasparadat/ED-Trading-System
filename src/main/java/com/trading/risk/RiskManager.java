@@ -7,8 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RiskManager {
-    private final List<RiskRule>    rules;
-    private final PortfolioTracker  portfolioReference;
+    private final List<RiskRule> rules;
+    private final PortfolioTracker portfolioReference;
 
     /**
      * Constructs a RiskManager with all risk rules initialised.

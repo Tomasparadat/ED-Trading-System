@@ -19,8 +19,8 @@ import java.util.List;
  * this is the only file that needs to be modified.
  *
  * Construction order is strictly linear to resolve dependencies:
- * Registry → Portfolio → Strategy → OrderMatcher → Risk → Handlers
- * → Disruptor (init) → MarketSimulator → Disruptor (start)
+ * Registry -> Portfolio -> Strategy -> OrderMatcher -> Risk -> Handlers
+ * -> Disruptor (init) -> MarketSimulator -> Disruptor (start)
  */
 public class SystemController {
     private static final List<String> SYMBOLS = List.of("BTC", "ETH", "AAPL", "TSLA", "DB");
@@ -57,7 +57,7 @@ public class SystemController {
     public SystemController() {
         SymbolRegistry registry = new SymbolRegistry(SYMBOLS);
         PortfolioTracker portfolio = new PortfolioTracker();
-        this.registry  = registry;
+        this.registry = registry;
         this.portfolio = portfolio;
 
         StrategyEngine strategyEngine = new StrategyEngine(

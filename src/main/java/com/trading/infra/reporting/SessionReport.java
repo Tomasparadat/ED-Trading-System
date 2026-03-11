@@ -17,7 +17,7 @@ import java.time.format.DateTimeFormatter;
  */
 public class SessionReport {
     private final PortfolioTracker portfolio;
-    private final SymbolRegistry   registry;
+    private final SymbolRegistry registry;
 
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter
             .ofPattern("yyyy-MM-dd HH:mm:ss.SSS")

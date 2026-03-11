@@ -28,15 +28,12 @@ public class OrderChecker implements RiskRule {
 
         double lastPrice = lastKnownPrices[symbolId];
 
-        // No reference price yet — let it through, can't validate
         if (lastPrice == 0.0) {
             return RiskResult.PASSED;
         }
 
         double deviation = Math.abs(order.getPrice() - lastPrice) / lastPrice;
 
-        return deviation > maxPriceDeviationPercent
-                ? RiskResult.REJECTED_PRICE_INVALID
-                : RiskResult.PASSED;
+        return deviation > maxPriceDeviationPercent ? RiskResult.REJECTED_PRICE_INVALID : RiskResult.PASSED;
     }
 }

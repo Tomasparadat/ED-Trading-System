@@ -73,7 +73,7 @@ public class DisruptorManager {
     }
 
     public EventProducer getProducer() {
-        return new  EventProducer(disruptor.getRingBuffer(), symbolRegistry);
+        return new EventProducer(disruptor.getRingBuffer(), symbolRegistry);
     }
 
     public RingBuffer<TradingEvent> getRingBuffer() {

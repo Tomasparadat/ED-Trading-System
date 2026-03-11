@@ -1,6 +1,5 @@
 package com.trading.sim;
 
-import com.lmax.disruptor.InsufficientCapacityException;
 import com.lmax.disruptor.RingBuffer;
 import com.trading.domain.EventType;
 import com.trading.infra.event.TradingEvent;

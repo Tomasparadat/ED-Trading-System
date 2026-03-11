@@ -23,7 +23,6 @@ public class SignalGenerator {
 
         boolean fastAboveSlow = calc.getFastSMA() > calc.getSlowSMA();
 
-        // First tick after warmup — initialise state, no signal yet
         if (!warmedUp) {
             prevFastAboveSlow = fastAboveSlow;
             warmedUp = true;

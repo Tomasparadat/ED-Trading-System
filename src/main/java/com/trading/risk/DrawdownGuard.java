@@ -23,8 +23,6 @@ public class DrawdownGuard implements RiskRule{
         if (order.getSide() == Side.SELL) return RiskResult.PASSED;
         double totalPnL = pt.getTotalRealizedPnL();
 
-        return totalPnL < -maxDailyLoss
-                ? RiskResult.REJECTED_DRAWDOWN_HALT
-                : RiskResult.PASSED;
+        return totalPnL < -maxDailyLoss ? RiskResult.REJECTED_DRAWDOWN_HALT : RiskResult.PASSED;
     }
 }

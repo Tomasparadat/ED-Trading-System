@@ -12,10 +12,21 @@ public class PortfolioHandler implements EventHandler<TradingEvent> {
         this.tracker = tracker;
     }
 
+    /**
+     * Receives each event from the Disruptor pipeline and delegates ORDER_FILL
+     * events to the PortfolioTracker for position and PnL updates.
+     * All other event types are ignored to keep the portfolio state clean —
+     * only confirmed fills should affect positions.
+     *
+     * @param event TradingEvent received from the ring buffer.
+     * @param sequence Ring buffer sequence number, passed through to PortfolioTracker for Ledger recording.
+     * @param endOfBatch Whether this is the last event in the current batch (unused).
+     * @throws Exception if PortfolioTracker.onEvent throws during position update.
+     */
     @Override
     public void onEvent(TradingEvent event, long sequence, boolean endOfBatch) throws Exception {
         if(event.getType() == EventType.ORDER_FILL){
-        tracker.onEvent(event, sequence, endOfBatch);
-        } else return;
+            tracker.onEvent(event, sequence, endOfBatch);
+        }
     }
 }

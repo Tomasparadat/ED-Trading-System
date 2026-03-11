@@ -41,20 +41,17 @@ public class Position {
      * @param fillPrice Price of Fill.
      */
     public void updateOnFill(double fillQty, double fillPrice) {
-        // Check if fill is a buy or sell.
         boolean isIncreasing = (this.quantity >= 0 && fillQty > 0) || (this.quantity <= 0 && fillQty < 0);
 
         if (isIncreasing) {
-            // BUY: Update position quantity and averageEntryPrice.
             double totalCost = (this.quantity * this.averageEntryPrice) + (fillQty * fillPrice);
             this.quantity += fillQty;
             this.averageEntryPrice = totalCost / this.quantity;
             this.lastTradeRealizedPnL = 0;
         } else {
-            // SELL: calculate PnL on sell.
+
             double qtyToClose = Math.min(Math.abs(this.quantity), Math.abs(fillQty));
 
-            // PnL = (Sell Price - Buy Price) * Quantity sold
             this.lastTradeRealizedPnL = (fillPrice - this.averageEntryPrice) * qtyToClose * Math.signum(this.quantity);
 
             this.quantity += fillQty;

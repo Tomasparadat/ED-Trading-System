@@ -2,7 +2,6 @@ package com.trading.sim;
 
 import com.lmax.disruptor.EventHandler;
 import com.trading.api.MarketDataProvider;
-import com.trading.domain.Order;
 import com.trading.infra.event.TradingEvent;
 
 public class MarketSimulator implements MarketDataProvider, EventHandler<TradingEvent> {
@@ -18,9 +17,9 @@ public class MarketSimulator implements MarketDataProvider, EventHandler<Trading
      * OrderMatcher is injected rather than constructed internally so that its
      * lastKnownPrices array can be shared with RiskManager via SystemController.
      *
-     * @param producer       EventProducer for publishing tick events into the ring buffer.
+     * @param producer EventProducer for publishing tick events into the ring buffer.
      * @param symbolRegistry Registry of all tracked symbols and their IDs.
-     * @param orderMatcher   Shared OrderMatcher, also referenced by RiskManager.
+     * @param orderMatcher Shared OrderMatcher, also referenced by RiskManager.
      * @param tickIntervalMs Milliseconds to sleep between each round of price ticks.
      */
     public MarketSimulator(EventProducer producer, SymbolRegistry symbolRegistry, OrderMatcher orderMatcher, int tickIntervalMs) {
@@ -35,8 +34,8 @@ public class MarketSimulator implements MarketDataProvider, EventHandler<Trading
      * Called by the Disruptor thread on every event in the ring buffer.
      * Delegates to OrderMatcher to handle MARKET_TICK and NEW_ORDER events.
      *
-     * @param event      TradingEvent from the ring buffer.
-     * @param sequence   Ring buffer sequence number.
+     * @param event TradingEvent from the ring buffer.
+     * @param sequence Ring buffer sequence number.
      * @param endOfBatch Whether this is the last event in the current batch.
      */
     @Override

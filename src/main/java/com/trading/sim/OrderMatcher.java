@@ -100,9 +100,7 @@ public class OrderMatcher {
      * @return true if the order should be filled, false otherwise.
      */
     private boolean isMatch(OpenOrder order, double marketPrice) {
-        return order.side() == Side.BUY
-                ? marketPrice <= order.price()
-                : marketPrice >= order.price();
+        return order.side() == Side.BUY ? marketPrice <= order.price() : marketPrice >= order.price();
     }
 
     /**

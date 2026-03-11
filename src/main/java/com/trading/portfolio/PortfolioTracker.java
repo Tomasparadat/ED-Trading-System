@@ -28,9 +28,7 @@ public class PortfolioTracker implements EventHandler<TradingEvent> {
     public void onEvent(TradingEvent order, long sequence, boolean endOfBatch) {
         Position pos = posManager.getPosition(order.getSymbolId());
 
-        double fillQty = order.getSide() == Side.SELL
-                ? -order.getQuantity()
-                : order.getQuantity();
+        double fillQty = order.getSide() == Side.SELL ? -order.getQuantity() : order.getQuantity();
 
         if (pos == null) {
             if (order.getSide() == Side.SELL) {
