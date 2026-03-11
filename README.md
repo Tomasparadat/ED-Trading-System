@@ -7,6 +7,18 @@ A low-latency algorithmic trading system built in Java using the LMAX Disruptor 
 
 ![Event-Driven Trading System Architecture](docs/architecture.png)
 
+# Key Features
+
+- **LMAX Disruptor pipeline** — lock-free ring buffer replaces traditional blocking queues, enables high-throughput event processing with minimal latency between market tick and order fill (See Notes section below to understand current limitations).
+- **SMA crossover strategy** — independent fast/slow Simple Moving Average indicators per symbol using circular buffers for O(1) updates with no heap allocation on the hot path.
+- **Multi-rule risk validation** — orders pass through a configurable chain of rules (price deviation, position limit, drawdown guard) with fail-fast rejection on first breach of conditions.
+- **Market simulator** — multi-symbol/Ticker Gaussian random walk price generator publishing ticks on a configurable interval, with a limit order book that matches resting orders against incoming prices.
+- **Position and PnL tracking** — per-symbol position management with average entry price calculation and realized PnL accumulation, broken down by symbol and in total.
+- **Immutable trade ledger** — every fill is snapshotted into an immutable `LedgerRecord` at execution time, preventing mutation bugs caused by the Disruptor reusing ring buffer memory.
+- **Centralised configuration** — all parameters (symbols, strategy periods, risk limits, tick speed) defined in one place in `SystemController` with no hardcoded values scattered across the codebase.
+- **Session report** — full end-of-session summary on shutdown including trade log with timestamps, final positions, and realized PnL per symbol.
+
+---
 ## Architecture
 
 The system is built around a single Disruptor pipeline where each event flows through a chain of handlers in sequence:
