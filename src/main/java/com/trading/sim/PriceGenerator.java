@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.Random;
 
 public class PriceGenerator {
-    private static final double VOLATILITY = 0.005;
+    private static final double VOLATILITY = 0.002;
     private static final double STARTING_PRICE = 100.00;
     private double[]  priceList;
     private final Random random = new Random();

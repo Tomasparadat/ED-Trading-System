@@ -5,6 +5,10 @@ import com.trading.domain.EventType;
 import com.trading.infra.event.TradingEvent;
 import com.trading.risk.RiskManager;
 
+// NOTE: This handler mutates the event type in place rather than publishing
+// a new ring buffer slot. This works for a single-threaded pipeline but
+// limits throughput and prevents multiple fills per tick.
+// TODO: Refactor to EventProducer.publishFill() when scaling up.
 public class RiskHandler implements EventHandler<TradingEvent> {
     private final RiskManager riskManager;
 

@@ -10,8 +10,15 @@ public class OrderMatcher {
     private final double[] lastKnownPrices;
     private final SymbolRegistry registry;
     private final List<OpenOrder>[] book;
+
     private record OpenOrder(long orderId, int symbolId, double price, double quantity, Side side) {}
 
+    /**
+     * Constructs an OrderMatcher for the given symbol registry.
+     * Pre-allocates one order bucket per symbol to avoid runtime allocation.
+     *
+     * @param registry SymbolRegistry defining all valid symbols and their IDs.
+     */
     @SuppressWarnings("unchecked")
     public OrderMatcher(SymbolRegistry registry) {
         this.registry = registry;
@@ -24,9 +31,11 @@ public class OrderMatcher {
     }
 
     /**
-     * Checks for TradingEvent Type and calls handleTick or handleNewOrder depending on it's value.
+     * Entry point called by MarketSimulator on each event.
+     * Routes to the correct handler based on event type.
+     * Unrecognised types are ignored.
      *
-     * @param event TradingEvent that's being evaluated.
+     * @param event TradingEvent received from the ring buffer.
      */
     public void onEvent(TradingEvent event) {
         switch (event.getType()) {
@@ -36,11 +45,16 @@ public class OrderMatcher {
     }
 
     /**
-     * Handles MARKET_TICK event types. Method checks if there are any orders or the tick is empty, once the check
-     * is passed it iterates through orders Bucket corresponding to the tick id. Where it then checks for an order match
-     * which it proceeds to fill if the requirements are met.
+     * Handles a MARKET_TICK event. Updates the last known price for the symbol,
+     * then scans the order book for the first resting order that can be filled
+     * at the current market price.
      *
-     * @param tick TradingEvent being Evaluated, it's EventType get's evaluated in onEvent().
+     * NOTE: Only one fill is processed per tick. The event is mutated in place
+     * to become an ORDER_FILL, which means a second fill would overwrite the first
+     * in the same ring buffer slot. This is a known limitation.
+     * TODO: Refactor to publish a new ring buffer slot per fill when scaling up.
+     *
+     * @param tick The incoming MARKET_TICK TradingEvent.
      */
     private void handleTick(TradingEvent tick) {
         int id = tick.getSymbolId();
@@ -48,7 +62,7 @@ public class OrderMatcher {
         lastKnownPrices[id] = currentPrice;
 
         List<OpenOrder> orders = book[id];
-        if (orders.isEmpty()) return;  // null check no longer needed
+        if (orders.isEmpty()) return;
 
         Iterator<OpenOrder> iterator = orders.iterator();
         while (iterator.hasNext()) {
@@ -56,18 +70,18 @@ public class OrderMatcher {
             if (isMatch(order, currentPrice)) {
                 applyFill(tick, order);
                 iterator.remove();
-                return; // see Bug 1 note above
+                return;
             }
         }
+    }
 
-
-        /**
-         * Updates TradingEvent attributes. transforming it into a ORDER_FILL and passing the orderId, price and quantity
-         * as it's new values.
-         *
-         * @param event TradingEvent Object being recycled.
-         * @param order OpenOrder being matched.
-         */
+    /**
+     * Mutates the TradingEvent in place, transforming it from a MARKET_TICK
+     * into an ORDER_FILL with the matched order's attributes.
+     *
+     * @param event TradingEvent to mutate.
+     * @param order Matched OpenOrder whose values are applied to the event.
+     */
     private void applyFill(TradingEvent event, OpenOrder order) {
         event.setType(EventType.ORDER_FILL);
         event.setOrderId(order.orderId());
@@ -77,40 +91,46 @@ public class OrderMatcher {
     }
 
     /**
-     * Checks if MarketPrice equals or is better than ask Price.
+     * Determines whether a resting order can be filled at the current market price.
+     * A BUY order matches when the market price is at or below the order price.
+     * A SELL order matches when the market price is at or above the order price.
      *
-     * @param order OpenOrder being evaluated for a fill.
-     * @param marketPrice current MarketPrice of the underlying asset.
-     * @return true if marketPrice equals or is better than order Price, false if the contrary is the case.
+     * @param order The resting OpenOrder to evaluate.
+     * @param marketPrice The current market price of the underlying asset.
+     * @return true if the order should be filled, false otherwise.
      */
     private boolean isMatch(OpenOrder order, double marketPrice) {
-        if (order.side() == Side.BUY) {
-            return marketPrice <= order.price();
-        } else {
-            return marketPrice >= order.price();
-        }
+        return order.side() == Side.BUY
+                ? marketPrice <= order.price()
+                : marketPrice >= order.price();
     }
 
-
     /**
-     * Create OpenOrder Record to persist in book map. This prevents losing the data to the Ring-Buffer when it recycles
-     * the TradingEvent Object. If the book is absent, the method creates a new ArrayList where it adds the
-     * persistentOrder, this avoids
-     * NullPointerExceptions.
+     * Persists an incoming NEW_ORDER event as an OpenOrder record in the order book.
+     * Copying into an immutable record prevents data loss when the ring buffer
+     * recycles the TradingEvent slot.
      *
-     * @param event that needs to be copied as a record in order to persist it.
+     * @param event The NEW_ORDER TradingEvent to persist.
      */
     private void handleNewOrder(TradingEvent event) {
-        OpenOrder persistentOrder = new OpenOrder(
+        OpenOrder order = new OpenOrder(
                 event.getOrderId(),
                 event.getSymbolId(),
                 event.getPrice(),
                 event.getQuantity(),
                 event.getSide()
         );
-
-        book[persistentOrder.symbolId()].add(persistentOrder);
+        book[order.symbolId()].add(order);
     }
 
-    public double[] getLastKnownPrices() { return lastKnownPrices; }
+    /**
+     * Returns the last known market price array, shared with OrderChecker
+     * for price deviation validation in the risk layer.
+     * Updated on every MARKET_TICK.
+     *
+     * @return Array of last known prices indexed by symbolId.
+     */
+    public double[] getLastKnownPrices() {
+        return lastKnownPrices;
+    }
 }

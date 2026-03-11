@@ -18,10 +18,11 @@ public class StrategyEngine {
     private Side proposedSide = null;
 
     /**
-     *
-     * @param fastPeriod
-     * @param slowPeriod
-     * @param symbolCount
+     * Constructs a StrategyEngine with independant SMA indicator per symbol.
+     * @param fastPeriod No. of ticks for the fast SMA window.
+     * @param slowPeriod No. of ticks for the slow SMA window
+     * @param symbolCount Total No. of symbols from SymbolRegistry, used to
+     *                    size the indicator and signal arrays.
      */
     public StrategyEngine(int fastPeriod, int slowPeriod, int symbolCount) {
         this.indicators = new IndicatorCalculator[symbolCount];
@@ -34,9 +35,12 @@ public class StrategyEngine {
     }
 
     /**
+     * Feeds the latest price into the indicator for this symbol and checks
+     * for a crossover signal. Stores the resulting side for StrategyHandler
+     * to read via getProposedSide()
      *
-     * @param event
-     * @return
+     * @param event Incoming MARKET_TICK event containing symbolId and price.
+     * @return true if a BUY or SELL signal was generated, false for HOLD.
      */
     public boolean processTrade(TradingEvent event) {
         int symbolId = event.getSymbolId();

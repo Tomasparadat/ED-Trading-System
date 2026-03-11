@@ -1,28 +1,29 @@
 package com.trading.risk;
 
+import com.trading.domain.Side;
 import com.trading.infra.event.TradingEvent;
 import com.trading.portfolio.PortfolioTracker;
 
 public class DrawdownGuard implements RiskRule{
-    // Arbitrary number (10K max dail loss)
-    //TODO: Implement easy change in a controller.
-    private double maxDailyLoss = 10000.00;
+    private double maxDailyLoss;
+
+    public DrawdownGuard(double maxDailyLoss) {
+        this.maxDailyLoss = maxDailyLoss;
+    }
 
     /**
-     * Check if total realized PnL is greater than Max Daily loss limit.
+     * Rejects the order if total realized PnL has fallen below the max daily loss threshold.
      *
-     * totalRealizedPnL can be a negative number and encompasses win and loss trades for simplicity.
-     *
-     * @param order
-     * @param pt
-     * @return
+     * @param order The ORDER_PROPOSED event being evaluated (not used directly, limit is portfolio-level).
+     * @param pt PortfolioTracker providing the current total realized PnL.
+     * @return REJECTED_DRAWDOWN_HALT if the loss limit is surpassed, PASSED otherwise.
      */
-    //TODO: Check for daily and not total pnl for account lifecycle.
     @Override
     public RiskResult validate(TradingEvent order, PortfolioTracker pt) {
+        if (order.getSide() == Side.SELL) return RiskResult.PASSED;
         double totalPnL = pt.getTotalRealizedPnL();
 
-        return pt.getTotalRealizedPnL() < -maxDailyLoss
+        return totalPnL < -maxDailyLoss
                 ? RiskResult.REJECTED_DRAWDOWN_HALT
                 : RiskResult.PASSED;
     }

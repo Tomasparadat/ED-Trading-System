@@ -1,0 +1,85 @@
+package com.trading.infra.reporting;
+
+import com.trading.portfolio.Ledger;
+import com.trading.portfolio.LedgerRecord;
+import com.trading.portfolio.PortfolioTracker;
+import com.trading.sim.SymbolRegistry;
+
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+
+/**
+ * Generates a human-readable summary of a completed trading session.
+ * Reads final state from PortfolioTracker and full trade history from Ledger.
+ * Intended as a temporary reporting solution — replace with QuestDB queries
+ * when the database layer is implemented.
+ */
+public class SessionReport {
+    private final PortfolioTracker portfolio;
+    private final SymbolRegistry   registry;
+
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter
+            .ofPattern("yyyy-MM-dd HH:mm:ss.SSS")
+            .withZone(ZoneId.systemDefault());
+
+    /**
+     * Constructs a SessionReport for the given portfolio and symbol registry.
+     *
+     * @param portfolio PortfolioTracker holding final position and PnL state.
+     * @param registry  SymbolRegistry used to resolve symbolIds to ticker names.
+     */
+    public SessionReport(PortfolioTracker portfolio, SymbolRegistry registry) {
+        this.portfolio = portfolio;
+        this.registry  = registry;
+    }
+
+    /**
+     * Prints a full session summary to stdout including the complete trade log,
+     * final positions per symbol, per-symbol realized PnL, and total realized PnL.
+     */
+    public void print() {
+        Ledger ledger = portfolio.getLedger();
+
+        System.out.println("\n========================================");
+        System.out.println("          SESSION REPORT                ");
+        System.out.println("========================================");
+
+        System.out.printf("%n--- Trade Log (%d fills) ---%n", ledger.getTotalTrades());
+        System.out.printf("  %-8s %-6s %-5s %-10s %-8s %-25s%n",
+                "orderId", "symbol", "side", "price", "qty", "timestamp");
+        System.out.println("  " + "-".repeat(70));
+
+        for (LedgerRecord r : ledger.getTradeHistory()) {
+            System.out.printf("  %-8d %-6s %-5s %-10.2f %-8.1f %s%n",
+                    r.getOrderId(),
+                    registry.getSymbolName(r.getSymbolId()),
+                    r.getSide(),
+                    r.getPrice(),
+                    r.getQuantity(),
+                    FORMATTER.format(Instant.ofEpochMilli(r.getTimestamp()))
+            );
+        }
+
+        System.out.println("\n--- Final Positions ---");
+        for (int i = 0; i < registry.size(); i++) {
+            System.out.printf("  %-6s | qty: %8.2f%n",
+                    registry.getSymbolName(i),
+                    portfolio.getPositionQuantity(i)
+            );
+        }
+
+        System.out.println("\n--- Realized PnL by Symbol ---");
+        for (int i = 0; i < registry.size(); i++) {
+            System.out.printf("  %-6s | pnl: %+10.2f%n",
+                    registry.getSymbolName(i),
+                    portfolio.getPnLForSymbol(i)
+            );
+        }
+
+        System.out.println("\n--- Total ---");
+        System.out.printf("  Total Fills:        %d%n", ledger.getTotalTrades());
+        System.out.printf("  Total Realized PnL: %+.2f%n", portfolio.getTotalRealizedPnL());
+        System.out.println("========================================\n");
+    }
+}

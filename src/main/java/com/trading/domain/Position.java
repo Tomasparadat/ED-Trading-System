@@ -83,6 +83,8 @@ public class Position {
     /**
      * Returns the realized PnL from the last trade and resets it to 0.
      * Prevents double-counting if calculate() is called on a BUY event.
+     *
+     * @return Realized PnL from the last trade, then resets to 0.
      */
     public double consumeLastTradeRealizedPnL() {
         double pnl = this.lastTradeRealizedPnL;

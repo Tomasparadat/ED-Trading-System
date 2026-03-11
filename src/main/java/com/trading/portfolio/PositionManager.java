@@ -12,18 +12,6 @@ public class PositionManager {
     }
 
     /**
-     * Update the quantity and average Entry-Price of a given position passed
-     * as the Ticker Symbol of the Stock.
-     *
-     * @param symbolId Ticker symbol of traded asset.
-     * @param quantity Traded quantity.
-     * @param price Asset fill price.
-     */
-    public void updatePositions(int symbolId, double quantity, double price){
-        positions.get(symbolId).updateOnFill(quantity, price);
-    }
-
-    /**
      *  Retrieve X Position from map
      *
      * @param symbolId Ticker symbol of traded asset.

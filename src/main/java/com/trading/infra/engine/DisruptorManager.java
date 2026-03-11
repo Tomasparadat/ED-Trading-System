@@ -14,7 +14,7 @@ import com.trading.sim.MarketSimulator;
 import com.trading.sim.SymbolRegistry;
 
 public class DisruptorManager {
-    private static final int BUFFER_SIZE = 1024;
+    private static final int BUFFER_SIZE = 4096;
 
 
     private Disruptor<TradingEvent> disruptor;
@@ -41,21 +41,30 @@ public class DisruptorManager {
     }
 
     /**
-     * Initializes the disruptor using the TradingEventFactory() and sets the order of handling Events:
-     * marketSimulator -> strategyHandler -> riskHandler -> portfolioHandler, dbLoggerHandler (simultaneous handling).
+     * Builds the Disruptor and starts the ring buffer.
+     * Must be called before getProducer().
+     * Does not register any handlers yet — call start(MarketSimulator) after
+     * MarketSimulator is constructed.
      */
-    public void start(MarketSimulator marketSimulator) {
+    public void init() {
         disruptor = new Disruptor<>(
                 new TradingEventFactory(),
                 BUFFER_SIZE,
                 DaemonThreadFactory.INSTANCE
         );
+    }
 
+    /**
+     * Registers all handlers in pipeline order and begins event processing.
+     * Must be called after init() and after MarketSimulator is constructed.
+     *
+     * @param marketSimulator First handler in the pipeline, processes MARKET_TICK events.
+     */
+    public void start(MarketSimulator marketSimulator) {
         disruptor.handleEventsWith(marketSimulator)
                 .then(strategyHandler)
                 .then(riskHandler)
                 .then(portfolioHandler, dbLoggerHandler);
-
         ringBuffer = disruptor.start();
     }
 

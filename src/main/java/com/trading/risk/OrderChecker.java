@@ -4,11 +4,12 @@ import com.trading.infra.event.TradingEvent;
 import com.trading.portfolio.PortfolioTracker;
 
 public class OrderChecker implements RiskRule {
-    private final double maxPriceDeviationPercent = 0.05;
+    private final double maxPriceDeviationPercent;
     private final double[] lastKnownPrices;
 
-    public OrderChecker(double[] lastKnownPrices) {
+    public OrderChecker(double[] lastKnownPrices, double maxPriceDeviationPercent) {
         this.lastKnownPrices = lastKnownPrices;
+        this.maxPriceDeviationPercent = maxPriceDeviationPercent;
     }
 
     /**

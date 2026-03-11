@@ -1,21 +1,71 @@
 package com.trading.portfolio;
 
+import com.trading.domain.Side;
 import com.trading.infra.event.TradingEvent;
 
 /**
- * Records Snapshot of Trading Event to avoid Mutation Bugs through Ring Buffer in the Disruptor.
- *
+ * Immutable snapshot of a completed ORDER_FILL event.
+ * Copied from the TradingEvent at fill time to prevent mutation bugs
+ * caused by the Disruptor reusing ring buffer slots.
  */
 public class LedgerRecord {
     private final long sequence;
-    private final int symbol;
+    private final int symbolId;
     private final double quantity;
     private final double price;
+    private final Side side;
+    private final long timestamp;
+    private final long orderId;
 
+    /**
+     * Constructs a LedgerRecord by snapshotting all relevant fields
+     * from the TradingEvent at the moment of fill.
+     *
+     * @param sequence Ring buffer sequence number, used as a unique record ID.
+     * @param order The ORDER_FILL TradingEvent to snapshot.
+     */
     public LedgerRecord(long sequence, TradingEvent order) {
         this.sequence = sequence;
-        this.symbol = order.getSymbolId();
+        this.symbolId = order.getSymbolId();
         this.quantity = order.getQuantity();
         this.price = order.getPrice();
+        this.side = order.getSide();
+        this.timestamp = order.getTimestamp();
+        this.orderId = order.getOrderId();
     }
+
+    /**
+     * @return Ring buffer sequence number of this record.
+     */
+    public long getSequence() { return sequence; }
+
+    /**
+     * @return Internal symbol ID of the filled asset.
+     */
+    public int getSymbolId() { return symbolId; }
+
+    /**
+     * @return Quantity filled.
+     */
+    public double getQuantity() { return quantity; }
+
+    /**
+     * @return Price at which the order was filled.
+     */
+    public double getPrice() { return price; }
+
+    /**
+     * @return Side of the fill — BUY or SELL.
+     */
+    public Side getSide() { return side; }
+
+    /**
+     * @return Timestamp of the tick that triggered the fill.
+     */
+    public long getTimestamp() { return timestamp; }
+
+    /**
+     * @return Order ID of the filled order.
+     */
+    public long getOrderId() { return orderId; }
 }
