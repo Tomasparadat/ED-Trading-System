@@ -97,12 +97,13 @@ All tunable parameters are defined as constants at the top of `SystemController.
 
 ```java
 // Main
-SystemController system = new SystemController();
-system.start();
+    SystemController systemController = new SystemController();
+    systemController.start();
 
-Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-    system.stop();
-}));
+    // Trading System execution time.
+    Thread.sleep(20_000);
+
+    systemController.stop();
 ```
 
 Press `Ctrl+C` to stop. A session report is printed automatically on shutdown.
