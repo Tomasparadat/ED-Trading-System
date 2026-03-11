@@ -3,6 +3,9 @@
 A low-latency algorithmic trading system built in Java using the LMAX Disruptor pattern for high-throughput event processing.
 
 ---
+## System Diagram
+
+![Event-Driven Trading System Architecture](docs/architecture.png)
 
 ## Architecture
 
