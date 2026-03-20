@@ -10,10 +10,10 @@ public class PortfolioTracker implements EventHandler<TradingEvent> {
     private PnLCalculator pnlCalc;
     private Ledger ledger;
 
-    public PortfolioTracker() {
-        this.posManager = new PositionManager();
+    public PortfolioTracker(int symbolCount) {
+        this.posManager = new PositionManager(symbolCount);
         this.ledger = new Ledger();
-        this.pnlCalc = new PnLCalculator();
+        this.pnlCalc = new PnLCalculator(symbolCount);
     }
 
 

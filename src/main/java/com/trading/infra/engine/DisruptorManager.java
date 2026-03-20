@@ -47,11 +47,7 @@ public class DisruptorManager {
      * MarketSimulator is constructed.
      */
     public void init() {
-        disruptor = new Disruptor<>(
-                new TradingEventFactory(),
-                BUFFER_SIZE,
-                DaemonThreadFactory.INSTANCE
-        );
+        disruptor = new Disruptor<>(new TradingEventFactory(), BUFFER_SIZE, DaemonThreadFactory.INSTANCE);
     }
 
     /**
@@ -62,8 +58,7 @@ public class DisruptorManager {
      */
     public void start(MarketSimulator marketSimulator) {
         disruptor.handleEventsWith(marketSimulator)
-                .then(strategyHandler)
-                .then(riskHandler)
+                .then(strategyHandler).then(riskHandler)
                 .then(portfolioHandler, dbLoggerHandler);
         ringBuffer = disruptor.start();
     }

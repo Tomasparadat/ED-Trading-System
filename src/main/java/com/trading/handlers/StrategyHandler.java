@@ -3,6 +3,7 @@ package com.trading.handlers;
 import com.lmax.disruptor.EventHandler;
 import com.trading.domain.EventType;
 import com.trading.infra.event.TradingEvent;
+import com.trading.sim.EventProducer;
 import com.trading.strategy.StrategyEngine;
 
 import java.util.concurrent.atomic.AtomicLong;
@@ -12,11 +13,13 @@ import java.util.concurrent.atomic.AtomicLong;
 // limits throughput and prevents multiple fills per tick.
 // TODO: Refactor to EventProducer.publishFill() when scaling up.
 public class StrategyHandler implements EventHandler<TradingEvent> {
+    private final EventProducer orderProducer;
     private final StrategyEngine engine;
-    private AtomicLong ORDER_ID_ORIGIN = new AtomicLong();
+    private AtomicLong ORDER_ID_ORIGIN = new AtomicLong(0);
 
-    public StrategyHandler(StrategyEngine engine) {
+    public StrategyHandler(StrategyEngine engine, EventProducer orderProducer) {
         this.engine = engine;
+        this.orderProducer = orderProducer;
     }
 
     /**
@@ -29,24 +32,17 @@ public class StrategyHandler implements EventHandler<TradingEvent> {
      */
     @Override
     public void onEvent(TradingEvent event, long sequence, boolean endOfBatch) {
-
-        if (event.getType() != EventType.MARKET_TICK) {
-            return;
-        }
-
         boolean approved = engine.processTrade(event);
+        if (!approved) return;
 
-        if(approved) {
-            event.setType(EventType.ORDER_PROPOSED);
-            event.setOrderId(generateOrderId());
-            event.setStrategyId(engine.getStrategyId());
-            event.setQuantity(engine.getProposedQuantity());
-            event.setSide(engine.getProposedSide());
-        }
-    }
-
-
-    private long generateOrderId() {
-        return ORDER_ID_ORIGIN.incrementAndGet();
+        orderProducer.publishProposed(
+                ORDER_ID_ORIGIN.getAndIncrement(),
+                engine.getStrategyId(),
+                event.getSymbolId(),
+                event.getPrice(),
+                engine.getProposedQuantity(),
+                engine.getProposedSide(),
+                event.getTimestamp()
+        );
     }
 }

@@ -55,6 +55,30 @@ public class TradingEvent {
 
     public void setStrategyId(int strategyId) {this.strategyId = strategyId;}
 
+    public void setProposed(long orderId, int strategyId, int symbolId, double price, double quantity, Side side, long timestamp) {
+        clear();
+        this.type = EventType.ORDER_PROPOSED;
+        this.orderId = orderId;
+        this.strategyId = strategyId;
+        this.symbolId = symbolId;
+        this.price = price;
+        this.quantity = quantity;
+        this.side = side;
+        this.timestamp = timestamp;
+    }
+
+    public void setFill(long orderId, int strategyId, int symbolId, double price, double quantity, Side side, long timestamp) {
+        clear();
+        this.type = EventType.ORDER_FILL;
+        this.orderId = orderId;
+        this.strategyId = strategyId;
+        this.symbolId = symbolId;
+        this.price = price;
+        this.quantity = quantity;
+        this.side = side;
+        this.timestamp = timestamp;
+    }
+
 
 
     public long getOrderId() {return orderId;}
@@ -72,4 +96,5 @@ public class TradingEvent {
     public Side getSide() {return side;}
 
     public long getTimestamp() {return timestamp;}
+
 }

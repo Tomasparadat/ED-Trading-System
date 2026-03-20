@@ -4,6 +4,9 @@ import com.lmax.disruptor.EventHandler;
 import com.trading.api.MarketDataProvider;
 import com.trading.infra.event.TradingEvent;
 
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.LockSupport;
+
 public class MarketSimulator implements MarketDataProvider, EventHandler<TradingEvent> {
     private final EventProducer producer;
     private final SymbolRegistry symbolRegistry;
@@ -11,6 +14,7 @@ public class MarketSimulator implements MarketDataProvider, EventHandler<Trading
     private final OrderMatcher orderMatcher;
     private final int tickIntervalMs;
     private volatile boolean running = false;
+    private final AtomicLong tickCount = new AtomicLong(0);
 
     /**
      * Constructs a MarketSimulator with all dependencies injected.
@@ -63,14 +67,15 @@ public class MarketSimulator implements MarketDataProvider, EventHandler<Trading
             symbolRegistry.getAllIds().forEach(id -> {
                 double price = priceGenerator.nextPrice(id);
                 producer.publish(id, price);
+                tickCount.incrementAndGet();
             });
-            try {
-                Thread.sleep(tickIntervalMs);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                break;
-            }
+
+            LockSupport.parkNanos(1_000);
         }
+    }
+
+    public long getTickCount(){
+        return tickCount.get();
     }
 
     /**

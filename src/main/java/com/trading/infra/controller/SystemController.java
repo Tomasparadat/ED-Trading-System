@@ -1,7 +1,7 @@
 package com.trading.infra.controller;
 
 import com.trading.handlers.*;
-import com.trading.infra.engine.DisruptorManager;
+import com.trading.infra.engine.MultiBufferDisruptorManager;
 import com.trading.infra.reporting.SessionReport;
 import com.trading.portfolio.*;
 import com.trading.risk.*;
@@ -29,10 +29,10 @@ public class SystemController {
     private static final double MAX_POSITION_SIZE = 1000.0;
     private static final double MAX_DAILY_LOSS = 10000.0;
     private static final double MAX_PRICE_DEV_PCT = 0.05;
-    private static final int TICK_INTERVAL_MS = 10;
+    private static final int TICK_INTERVAL_MS = 2;
 
-    private final DisruptorManager disruptorManager;
-    private final MarketSimulator  marketSimulator;
+    private final MultiBufferDisruptorManager disruptorManager;
+    private final MarketSimulator marketSimulator;
     private final PortfolioTracker portfolio;
     private final SymbolRegistry registry;
 
@@ -56,7 +56,7 @@ public class SystemController {
      */
     public SystemController() {
         SymbolRegistry registry = new SymbolRegistry(SYMBOLS);
-        PortfolioTracker portfolio = new PortfolioTracker();
+        PortfolioTracker portfolio = new PortfolioTracker(registry.size());
         this.registry = registry;
         this.portfolio = portfolio;
 
@@ -74,28 +74,25 @@ public class SystemController {
                 MAX_PRICE_DEV_PCT
         );
 
-        StrategyHandler strategyHandler  = new StrategyHandler(strategyEngine);
-        RiskHandler riskHandler = new RiskHandler(riskManager);
         PortfolioHandler portfolioHandler = new PortfolioHandler(portfolio);
         DbLoggerHandler dbLoggerHandler  = new DbLoggerHandler(registry);
 
-        this.disruptorManager = new DisruptorManager(
-                registry, strategyHandler, riskHandler, portfolioHandler, dbLoggerHandler
-        );
+        disruptorManager = new MultiBufferDisruptorManager(
+                registry, null, null, portfolioHandler, dbLoggerHandler);
         disruptorManager.init();
 
-        EventProducer producer = disruptorManager.getProducer();
-        this.marketSimulator = new MarketSimulator(producer, registry, orderMatcher, TICK_INTERVAL_MS);
+        EventProducer tickProducer = disruptorManager.getTickProducer();
+        EventProducer orderProducer = disruptorManager.getOrderProducer();
+        EventProducer fillProducer = disruptorManager.getFillProducer();
 
-        disruptorManager.start(marketSimulator);
+        StrategyHandler strategyHandler  = new StrategyHandler(strategyEngine, orderProducer);
+        RiskHandler riskHandler = new RiskHandler(riskManager, fillProducer);
+
+        this.marketSimulator = new MarketSimulator(tickProducer, registry, orderMatcher, TICK_INTERVAL_MS);
+
+        disruptorManager.start(marketSimulator, strategyHandler, riskHandler);
     }
 
-    /**
-     * Starts the market simulation loop on a dedicated background thread.
-     * The simulation begins publishing MARKET_TICK events into the ring buffer
-     * at the configured TICK_INTERVAL_MS rate.
-     * Must be called after construction is complete.
-     */
     public void start() {
         marketSimulator.start();
     }
@@ -108,6 +105,6 @@ public class SystemController {
     public void stop() {
         marketSimulator.stop();
         disruptorManager.shutdown();
-        new SessionReport(portfolio, registry).print();
+        new SessionReport(portfolio, registry, marketSimulator.getTickCount()).print();
     }
 }

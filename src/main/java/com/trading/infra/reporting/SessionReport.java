@@ -18,6 +18,7 @@ import java.time.format.DateTimeFormatter;
 public class SessionReport {
     private final PortfolioTracker portfolio;
     private final SymbolRegistry registry;
+    private final long totalTicks;
 
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter
             .ofPattern("yyyy-MM-dd HH:mm:ss.SSS")
@@ -29,9 +30,10 @@ public class SessionReport {
      * @param portfolio PortfolioTracker holding final position and PnL state.
      * @param registry  SymbolRegistry used to resolve symbolIds to ticker names.
      */
-    public SessionReport(PortfolioTracker portfolio, SymbolRegistry registry) {
+    public SessionReport(PortfolioTracker portfolio, SymbolRegistry registry, long totalTicks) {
         this.portfolio = portfolio;
-        this.registry  = registry;
+        this.registry = registry;
+        this.totalTicks = totalTicks;
     }
 
     /**
@@ -78,7 +80,9 @@ public class SessionReport {
         }
 
         System.out.println("\n--- Total ---");
-        System.out.printf("  Total Fills:        %d%n", ledger.getTotalTrades());
+        System.out.printf("  Total Ticks: %d%n", totalTicks);
+        System.out.printf("  Total Fills: %d%n", ledger.getTotalTrades());
+        System.out.printf("  Fill Rate: %.4f%%%n", totalTicks == 0 ? 0.0 : (ledger.getTotalTrades() * 100.0 / totalTicks));
         System.out.printf("  Total Realized PnL: %+.2f%n", portfolio.getTotalRealizedPnL());
         System.out.println("========================================\n");
     }

@@ -5,10 +5,11 @@ import java.util.Map;
 import com.trading.domain.Position;
 
 public class PositionManager {
-    private Map<Integer, Position> positions;
+    // private Map<Integer, Position> positions;
+    private final Position[] positions;
 
-    public PositionManager() {
-        this.positions = new HashMap<>();
+    public PositionManager(int symbolCount) {
+        this.positions = new Position[symbolCount];
     }
 
     /**
@@ -18,7 +19,7 @@ public class PositionManager {
      * @return Position with Ticker-Name of symbol parameter.
      */
     public Position getPosition(int symbolId){
-        return positions.get(symbolId);
+        return positions[symbolId];
     }
 
     /**
@@ -30,9 +31,7 @@ public class PositionManager {
      * @param price Fill Price.
      */
     public void createNewPosition(int symbolId, double quantity, double price){
-        if(quantity <= 0.0){ return; }
-        if(price <= 0.0){ return; }
-
-        positions.put(symbolId, new Position(symbolId, quantity, price));
+        if (quantity <= 0.0 || price <= 0.0) return;
+        positions[symbolId] = new Position(symbolId, quantity, price);
     }
 }

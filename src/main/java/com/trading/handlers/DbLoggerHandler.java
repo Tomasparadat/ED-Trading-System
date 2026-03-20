@@ -7,8 +7,7 @@ import com.trading.sim.SymbolRegistry;
 
 public class DbLoggerHandler implements EventHandler<TradingEvent> {
     private final SymbolRegistry registry;
-    private final java.util.concurrent.BlockingQueue<String> logQueue
-            = new java.util.concurrent.LinkedBlockingQueue<>();
+    private final java.util.concurrent.BlockingQueue<String> logQueue = new java.util.concurrent.LinkedBlockingQueue<>();
 
     /**
      * Constructs a DbLoggerHandler and starts a dedicated daemon logging thread.
@@ -46,14 +45,6 @@ public class DbLoggerHandler implements EventHandler<TradingEvent> {
     @Override
     public void onEvent(TradingEvent event, long sequence, boolean endOfBatch) {
         if (event.getType() != EventType.ORDER_FILL) return;
-
-        logQueue.offer(String.format(
-                "[FILL] orderId=%-5d | symbol=%-4s | side=%-4s | price=%8.2f | qty=%6.1f",
-                event.getOrderId(),
-                registry.getSymbolName(event.getSymbolId()),
-                event.getSide(),
-                event.getPrice(),
-                event.getQuantity()
-        ));
+        // removed single event printing for performance.
     }
 }

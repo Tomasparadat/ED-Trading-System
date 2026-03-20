@@ -1,6 +1,7 @@
 package com.trading.portfolio;
 
 import com.trading.domain.Position;
+import com.trading.infra.engine.MultiBufferDisruptorManager;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -8,21 +9,19 @@ import java.util.Map;
 
 public class PnLCalculator {
     private double totalRealizedPnL;
-    private final Map<Integer, Double> pnlBySymbol = new HashMap<>();
+    private final double[] pnlBySymbol;
 
-    /**
-     * Consumes the last trade's realized PnL from the position and accumulates
-     * it into the total and per-symbol trackers. Skips positions with no PnL
-     * to avoid polluting the totals.
-     *
-     * @param pos Position to read and consume realized PnL from.
-     */
+
+    public PnLCalculator(int symbolCount) {
+        this.pnlBySymbol = new double[symbolCount];
+    }
+
     public void calculate(Position pos) {
         double tradePnL = pos.consumeLastTradeRealizedPnL();
         if (tradePnL == 0) return;
 
-        this.totalRealizedPnL += tradePnL;
-        pnlBySymbol.merge(pos.getSymbolId(), tradePnL, Double::sum);
+        totalRealizedPnL += tradePnL;
+        pnlBySymbol[pos.getSymbolId()] += tradePnL;
     }
 
     /**
@@ -41,15 +40,7 @@ public class PnLCalculator {
      * @return Realized PnL for the symbol, or 0.0 if no trades recorded.
      */
     public double getPnLForSymbol(int symbolId) {
-        return pnlBySymbol.getOrDefault(symbolId, 0.0);
+        return pnlBySymbol[symbolId];
     }
 
-    /**
-     * Resets all PnL accumulators. Should be called at the start of each
-     * trading day to ensure DrawdownGuard tracks daily loss correctly.
-     */
-    public void resetDaily() {
-        totalRealizedPnL = 0;
-        pnlBySymbol.clear();
-    }
 }

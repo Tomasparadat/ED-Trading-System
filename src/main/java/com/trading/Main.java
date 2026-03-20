@@ -2,7 +2,6 @@ package com.trading;
 
 
 import com.trading.infra.controller.SystemController;
-import com.trading.infra.reporting.SessionReport;
 
 public class Main {
 
@@ -10,7 +9,8 @@ public class Main {
         SystemController systemController = new SystemController();
         systemController.start();
 
-        Thread.sleep(20_000);
+        // Trading System execution time.
+        Thread.sleep(10_000);
 
         systemController.stop();
     }
