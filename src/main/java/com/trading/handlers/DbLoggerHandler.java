@@ -19,6 +19,7 @@ public class DbLoggerHandler implements EventHandler<TradingEvent> {
     public DbLoggerHandler(SymbolRegistry registry) {
         this.registry = registry;
 
+        // Not in use - deprecated
         Thread logger = new Thread(() -> {
             while (true) {
                 try {

@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class Benchmark {
     private static final int WARMUP_SECONDS = 5;
-    private static final int MEASURE_SECONDS = 15;
+    private static final int MEASURE_SECONDS = 30;
 
     public static void main(String[] args) throws InterruptedException {
         System.out.println("Warming up...");

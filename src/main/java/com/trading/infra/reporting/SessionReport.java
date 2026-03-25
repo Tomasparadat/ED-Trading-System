@@ -8,6 +8,7 @@ import com.trading.sim.SymbolRegistry;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 /**
  * Generates a human-readable summary of a completed trading session.
@@ -47,12 +48,12 @@ public class SessionReport {
         System.out.println("          SESSION REPORT                ");
         System.out.println("========================================");
 
-        System.out.printf("%n--- Trade Log (%d fills) ---%n", ledger.getTotalTrades());
-        System.out.printf("  %-8s %-6s %-5s %-10s %-8s %-25s%n",
-                "orderId", "symbol", "side", "price", "qty", "timestamp");
-        System.out.println("  " + "-".repeat(70));
+        System.out.printf("%n--- Trade Log (showing last 20 of %d fills) ---%n", ledger.getTotalTrades());
+        List<LedgerRecord> history = ledger.getTradeHistory();
+        int start = Math.max(0, history.size() - 20);
 
-        for (LedgerRecord r : ledger.getTradeHistory()) {
+        for (int i = start; i < history.size(); i++) {
+            LedgerRecord r = history.get(i);
             System.out.printf("  %-8d %-6s %-5s %-10.2f %-8.1f %s%n",
                     r.getOrderId(),
                     registry.getSymbolName(r.getSymbolId()),
