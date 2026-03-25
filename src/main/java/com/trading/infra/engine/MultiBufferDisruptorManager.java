@@ -36,7 +36,6 @@ public class MultiBufferDisruptorManager {
             RiskHandler riskHandler,
             PortfolioHandler portfolioHandler,
             DbLoggerHandler dbLoggerHandler
-
     ) {
         this.symbolRegistry = symbolRegistry;
         this.strategyHandler = strategyHandler;
@@ -50,9 +49,9 @@ public class MultiBufferDisruptorManager {
         orderDisruptor = new Disruptor<>(new TradingEventFactory(), BUFFER_SIZE, DaemonThreadFactory.INSTANCE);
         fillDisruptor = new Disruptor<>(new TradingEventFactory(), BUFFER_SIZE, DaemonThreadFactory.INSTANCE);
 
-        tickBuffer  = tickDisruptor.getRingBuffer();
+        tickBuffer = tickDisruptor.getRingBuffer();
         orderBuffer = orderDisruptor.getRingBuffer();
-        fillBuffer  = fillDisruptor.getRingBuffer();
+        fillBuffer = fillDisruptor.getRingBuffer();
     }
 
     /**
@@ -62,7 +61,7 @@ public class MultiBufferDisruptorManager {
      *
      * @param marketSimulator First handler in the pipeline, reads from TickBuffer.
      */
-    public void start(MarketSimulator  marketSimulator, StrategyHandler strategyHandler, RiskHandler riskHandler) {
+    public void start(MarketSimulator marketSimulator, StrategyHandler strategyHandler, RiskHandler riskHandler) {
         tickDisruptor.handleEventsWith(marketSimulator, strategyHandler);
         orderDisruptor.handleEventsWith(riskHandler);
         fillDisruptor.handleEventsWith(portfolioHandler, dbLoggerHandler);
@@ -104,7 +103,6 @@ public class MultiBufferDisruptorManager {
 
     /**
      * Shuts down all three Disruptors cleanly.
-     * Should be called from SystemController.stop().
      */
     public void shutdown() {
         tickDisruptor.shutdown();
