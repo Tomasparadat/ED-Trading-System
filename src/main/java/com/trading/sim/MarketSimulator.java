@@ -61,11 +61,13 @@ public class MarketSimulator implements MarketDataProvider, EventHandler<Trading
      * Main simulation loop. Generates a new price for each registered symbol
      * and publishes it into the ring buffer, then sleeps for tickIntervalMs.
      * Stops cleanly when running is set to false via stop().
+     *
+     * priceGenerator determines if Arithmetic Random Walk or GBM is being used for price generation.
      */
     private void runSimulation() {
         while (running) {
             symbolRegistry.getAllIds().forEach(id -> {
-                double price = priceGenerator.nextPrice(id);
+                double price = priceGenerator.nextPriceGBM(id);
                 producer.publish(id, price);
                 tickCount.incrementAndGet();
             });

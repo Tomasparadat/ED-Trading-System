@@ -2,6 +2,7 @@ package com.trading.infra.controller;
 
 import com.trading.handlers.*;
 import com.trading.infra.engine.MultiBufferDisruptorManager;
+import com.trading.infra.reporting.CsvExporter;
 import com.trading.infra.reporting.SessionReport;
 import com.trading.portfolio.*;
 import com.trading.risk.*;
@@ -105,6 +106,14 @@ public class SystemController {
     public void stop() {
         marketSimulator.stop();
         disruptorManager.shutdown();
+
+        new CsvExporter(
+                portfolio.getLedger(),
+                registry,
+                "trades_" + System.currentTimeMillis() + ".csv"
+        ).export();
+
+
         new SessionReport(portfolio, registry, marketSimulator.getTickCount()).print();
     }
 

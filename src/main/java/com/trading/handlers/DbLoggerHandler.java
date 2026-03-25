@@ -7,7 +7,6 @@ import com.trading.sim.SymbolRegistry;
 
 public class DbLoggerHandler implements EventHandler<TradingEvent> {
     private final SymbolRegistry registry;
-    private final java.util.concurrent.BlockingQueue<String> logQueue = new java.util.concurrent.LinkedBlockingQueue<>();
 
     /**
      * Constructs a DbLoggerHandler and starts a dedicated daemon logging thread.
@@ -18,26 +17,12 @@ public class DbLoggerHandler implements EventHandler<TradingEvent> {
      */
     public DbLoggerHandler(SymbolRegistry registry) {
         this.registry = registry;
-
-        // Not in use - deprecated
-        Thread logger = new Thread(() -> {
-            while (true) {
-                try {
-                    System.out.println(logQueue.take());
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    break;
-                }
-            }
-        }, "LoggerThread");
-        logger.setDaemon(true);
-        logger.start();
     }
 
     /**
-     * Receives each event from the Disruptor pipeline. Filters for ORDER_FILL events only,
-     * formats a log entry, and places it on the log queue for the logger thread to print.
-     * Returns immediately for all other event types to minimise time on the hot path.
+     * Receives each event from the Disruptor pipeline. Filters for ORDER_FILL events only.
+     *
+     * NOT IN USE -> BlockingQueue hinders Throughput - Performance even while running on own Thread.
      *
      * @param event TradingEvent received from the ring buffer.
      * @param sequence Ring buffer sequence number (unused).
@@ -46,6 +31,5 @@ public class DbLoggerHandler implements EventHandler<TradingEvent> {
     @Override
     public void onEvent(TradingEvent event, long sequence, boolean endOfBatch) {
         if (event.getType() != EventType.ORDER_FILL) return;
-        // removed single event printing for performance.
     }
 }
