@@ -107,4 +107,12 @@ public class SystemController {
         disruptorManager.shutdown();
         new SessionReport(portfolio, registry, marketSimulator.getTickCount()).print();
     }
+
+    public long getTickCount() {
+        return marketSimulator.getTickCount();
+    }
+
+    public long getFillCount() {
+        return portfolio.getLedger().getTotalTrades();
+    }
 }
