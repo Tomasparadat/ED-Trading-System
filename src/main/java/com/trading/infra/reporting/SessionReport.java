@@ -11,9 +11,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 /**
- * Generates a human-readable summary of a completed trading session.
- * Reads final state from PortfolioTracker and full trade history from Ledger.
- * Intended as a temporary reporting solution — replace with QuestDB queries
+ * Replace with QuestDB queries
  * when the database layer is implemented.
  */
 public class SessionReport {
@@ -37,10 +35,7 @@ public class SessionReport {
         this.totalTicks = totalTicks;
     }
 
-    /**
-     * Prints a full session summary to stdout including the complete trade log,
-     * final positions per symbol, per-symbol realized PnL, and total realized PnL.
-     */
+
     public void print() {
         Ledger ledger = portfolio.getLedger();
 
