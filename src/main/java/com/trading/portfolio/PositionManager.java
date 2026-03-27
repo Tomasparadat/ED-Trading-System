@@ -1,11 +1,9 @@
 package com.trading.portfolio;
 
-import java.util.HashMap;
-import java.util.Map;
+
 import com.trading.domain.Position;
 
 public class PositionManager {
-    // private Map<Integer, Position> positions;
     private final Position[] positions;
 
     public PositionManager(int symbolCount) {
@@ -13,7 +11,7 @@ public class PositionManager {
     }
 
     /**
-     *  Retrieve X Position from map
+     * Retrieve X Position from map
      *
      * @param symbolId Ticker symbol of traded asset.
      * @return Position with Ticker-Name of symbol parameter.

@@ -3,11 +3,7 @@ package com.trading.portfolio;
 import com.trading.domain.Side;
 import com.trading.infra.event.TradingEvent;
 
-/**
- * Immutable snapshot of a completed ORDER_FILL event.
- * Copied from the TradingEvent at fill time to prevent mutation bugs
- * caused by the Disruptor reusing ring buffer slots.
- */
+
 public class LedgerRecord {
     private final long sequence;
     private final int symbolId;
@@ -34,10 +30,6 @@ public class LedgerRecord {
         this.orderId = order.getOrderId();
     }
 
-    /**
-     * @return Ring buffer sequence number of this record.
-     */
-    public long getSequence() { return sequence; }
 
     /**
      * @return Internal symbol ID of the filled asset.

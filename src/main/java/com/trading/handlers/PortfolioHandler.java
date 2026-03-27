@@ -20,7 +20,7 @@ public class PortfolioHandler implements EventHandler<TradingEvent> {
      *
      * @param event TradingEvent received from the ring buffer.
      * @param sequence Ring buffer sequence number, passed through to PortfolioTracker for Ledger recording.
-     * @param endOfBatch Whether this is the last event in the current batch (unused).
+     * @param endOfBatch -
      * @throws Exception if PortfolioTracker.onEvent throws during position update.
      */
     @Override

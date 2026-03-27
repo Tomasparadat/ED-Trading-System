@@ -1,24 +1,27 @@
 package com.trading.sim;
 
+import com.lmax.disruptor.EventHandler;
 import com.trading.domain.EventType;
 import com.trading.domain.Side;
 import com.trading.infra.event.TradingEvent;
 
 import java.util.*;
 
-public class OrderMatcher {
+public class OrderMatcher implements EventHandler<TradingEvent> {
     private final double[] lastKnownPrices;
     private final SymbolRegistry registry;
     private final List<OpenOrder>[] book;
 
+    @Override
+    public void onEvent(TradingEvent event, long l, boolean b) throws Exception {
+        switch (event.getType()) {
+            case MARKET_TICK -> handleTick(event);
+            case NEW_ORDER -> handleNewOrder(event);
+        }
+    }
+
     private record OpenOrder(long orderId, int symbolId, double price, double quantity, Side side) {}
 
-    /**
-     * Constructs an OrderMatcher for the given symbol registry.
-     * Pre-allocates one order bucket per symbol to avoid runtime allocation.
-     *
-     * @param registry SymbolRegistry defining all valid symbols and their IDs.
-     */
     @SuppressWarnings("unchecked")
     public OrderMatcher(SymbolRegistry registry) {
         this.registry = registry;
@@ -30,32 +33,7 @@ public class OrderMatcher {
         }
     }
 
-    /**
-     * Entry point called by MarketSimulator on each event.
-     * Routes to the correct handler based on event type.
-     * Unrecognised types are ignored.
-     *
-     * @param event TradingEvent received from the ring buffer.
-     */
-    public void onEvent(TradingEvent event) {
-        switch (event.getType()) {
-            case MARKET_TICK -> handleTick(event);
-            case NEW_ORDER -> handleNewOrder(event);
-        }
-    }
 
-    /**
-     * Handles a MARKET_TICK event. Updates the last known price for the symbol,
-     * then scans the order book for the first resting order that can be filled
-     * at the current market price.
-     *
-     * NOTE: Only one fill is processed per tick. The event is mutated in place
-     * to become an ORDER_FILL, which means a second fill would overwrite the first
-     * in the same ring buffer slot. This is a known limitation.
-     * TODO: Refactor to publish a new ring buffer slot per fill when scaling up.
-     *
-     * @param tick The incoming MARKET_TICK TradingEvent.
-     */
     private void handleTick(TradingEvent tick) {
         int id = tick.getSymbolId();
         double currentPrice = tick.getPrice();
@@ -64,12 +42,11 @@ public class OrderMatcher {
         List<OpenOrder> orders = book[id];
         if (orders.isEmpty()) return;
 
-        Iterator<OpenOrder> iterator = orders.iterator();
-        while (iterator.hasNext()) {
-            OpenOrder order = iterator.next();
+        for(int i = 0; i < orders.size(); i++) {
+            OpenOrder order = orders.get(i);
             if (isMatch(order, currentPrice)) {
                 applyFill(tick, order);
-                iterator.remove();
+                orders.remove(order);
                 return;
             }
         }

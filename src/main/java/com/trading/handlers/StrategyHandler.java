@@ -1,17 +1,12 @@
 package com.trading.handlers;
 
 import com.lmax.disruptor.EventHandler;
-import com.trading.domain.EventType;
 import com.trading.infra.event.TradingEvent;
 import com.trading.sim.EventProducer;
 import com.trading.strategy.StrategyEngine;
 
 import java.util.concurrent.atomic.AtomicLong;
 
-// NOTE: This handler mutates the event type in place rather than publishing
-// a new ring buffer slot. This works for a single-threaded pipeline but
-// limits throughput and prevents multiple fills per tick.
-// TODO: Refactor to EventProducer.publishFill() when scaling up.
 public class StrategyHandler implements EventHandler<TradingEvent> {
     private final EventProducer orderProducer;
     private final StrategyEngine engine;
@@ -23,8 +18,7 @@ public class StrategyHandler implements EventHandler<TradingEvent> {
     }
 
     /**
-     * Receives a TradingEvent, checks if it's a MarketTick, passes the Event to the StrategyEngine in order
-     * to approve or reject it, once approved it updates the TradingEvent so it can be picked up by the RiskManager.
+     * Receives a TradingEvent, checks if it's a MarketTick, passes the Event to the StrategyEngine.
      *
      * @param event Passed TradingEvent that is evaluated.
      * @param sequence -

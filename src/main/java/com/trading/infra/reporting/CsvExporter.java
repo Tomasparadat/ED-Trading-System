@@ -16,8 +16,7 @@ import java.time.format.DateTimeFormatter;
  * Each row represents one ORDER_FILL event captured as a LedgerRecord
  */
 public class CsvExporter {
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")
-            .withZone(ZoneId.systemDefault());
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS").withZone(ZoneId.systemDefault());
 
     private final Ledger ledger;
     private final SymbolRegistry registry;

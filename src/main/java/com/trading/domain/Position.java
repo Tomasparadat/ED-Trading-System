@@ -31,7 +31,7 @@ public class Position {
 
     /**
      * Update position based of Fill (Buy or sell).
-     * The method decides whether to sell or buy based off the fillQty, if the fillQty > 0 this signals a purchase,
+     * Decides whether to sell or buy based off the fillQty, if the fillQty > 0 this signals a purchase,
      * otherwise a sell is being executed.
      * BUY: Average entry price and position quantity are updated
      * SELL: Prevents Position from going short, if fillQty is greater than Position quantity,
@@ -60,13 +60,6 @@ public class Position {
                 this.averageEntryPrice = 0;
             }
         }
-    }
-
-    /**
-     * @return realized PnL from last Trade on Position.
-     */
-    public double getLastTradeRealizedPnL() {
-        return lastTradeRealizedPnL;
     }
 
    public int getSymbolId() {

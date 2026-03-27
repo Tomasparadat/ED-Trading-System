@@ -32,10 +32,8 @@ public class SignalGenerator {
         SignalType signal = SignalType.HOLD;
 
         if (fastAboveSlow && !prevFastAboveSlow) {
-            // fast crossed above slow
             signal = SignalType.BUY;
         } else if (!fastAboveSlow && prevFastAboveSlow) {
-            // fast crossed below slow
             signal = SignalType.SELL;
         }
 

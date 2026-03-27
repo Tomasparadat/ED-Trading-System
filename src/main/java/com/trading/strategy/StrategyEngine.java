@@ -7,6 +7,7 @@ import com.trading.infra.event.TradingEvent;
  * Drives the SMA crossover strategy.
  * Feeds each market tick into the IndicatorCalculator, checks for a signal,
  * and stores the decision for StrategyHandler to read.
+ * TODO: Re-Write to adapt for multiple strategies as single methods.
  */
 public class StrategyEngine {
     private static final int STRATEGY_ID = 1;

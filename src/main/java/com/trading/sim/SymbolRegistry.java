@@ -6,8 +6,7 @@ import java.util.HashMap;
 import java.util.stream.IntStream;
 
 /**
- * A high-performance, immutable registry that maps Ticker Strings to unique Integer IDs.
- * This allows the Core Engine to use primitive array indexing instead of Map lookups.
+ * High-performance, immutable registry that maps Ticker Strings to unique Integer IDs.
  */
 public class SymbolRegistry {
     private final String[] symbols;
@@ -32,7 +31,6 @@ public class SymbolRegistry {
 
     /**
      * Translates a Ticker String to its internal Integer ID using the HashMap.
-     * O(1) lookup. Returns -1 if the symbol is not registered.
      *
      * @param symbol Ticker string (e.g. "BTC").
      * @return The unique int ID, or -1 if not found.
@@ -43,7 +41,6 @@ public class SymbolRegistry {
 
     /**
      * Translates an internal Integer ID back to its Ticker String.
-     * Used by the QuestDBBridge or Logger for human-readable output.
      *
      * @param symbolId Internal integer ID.
      * @return The Ticker String (e.g. "BTC").
@@ -55,7 +52,6 @@ public class SymbolRegistry {
 
     /**
      * Returns the total count of registered symbols.
-     * Used by PriceGenerator and OrderMatcher to size their primitive arrays.
      *
      * @return Number of registered symbols.
      */
@@ -65,31 +61,11 @@ public class SymbolRegistry {
 
     /**
      * Returns a stream of all valid symbol IDs (0 to N-1).
-     * Used by MarketSimulator to iterate over all symbols each tick.
      *
      * @return IntStream of all symbol IDs.
      */
-    public IntStream getAllIds() {
-        return IntStream.range(0, symbols.length);
+    public int[] getAllIdsAsArray() {
+        return IntStream.range(0, symbols.length - 1).toArray();
     }
 
-    /**
-     * Checks whether a given symbol string is registered.
-     *
-     * @param symbol Ticker string to check.
-     * @return true if registered, false otherwise.
-     */
-    public boolean contains(String symbol) {
-        return hashIdMap.containsKey(symbol);
-    }
-
-    /**
-     * Checks whether a given symbol ID is within valid range.
-     *
-     * @param symbolId Integer ID to check.
-     * @return true if valid, false otherwise.
-     */
-    public boolean isValidId(int symbolId) {
-        return symbolId >= 0 && symbolId < symbols.length;
-    }
 }

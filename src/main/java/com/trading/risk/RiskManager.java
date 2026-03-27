@@ -12,8 +12,7 @@ public class RiskManager {
 
     /**
      * Constructs a RiskManager with all risk rules initialised.
-     * Parameters are passed through from SystemController so all limits
-     * are configured in one place.
+     * Parameters are passed through from SystemController.
      *
      * @param portfolioTracker PortfolioTracker shared with PortfolioHandler,
      *                         used by PositionLimitChecker and DrawdownGuard.
@@ -33,7 +32,7 @@ public class RiskManager {
 
     /**
      * Evaluates an ORDER_PROPOSED event against all registered risk rules in order.
-     * Returns false as soon as any rule rejects the order (fail-fast).
+     * Returns false as soon as any rule rejects the order.
      * Returns true only if all rules pass.
      *
      * @param order The ORDER_PROPOSED TradingEvent to evaluate.

@@ -8,8 +8,8 @@ import java.util.concurrent.TimeUnit;
  * duration and reports ticks per second and average latency per tick.
  */
 public class Benchmark {
-    private static final int WARMUP_SECONDS = 5;
-    private static final int MEASURE_SECONDS = 15;
+    private static final int WARMUP_SECONDS = 3;
+    private static final int MEASURE_SECONDS = 20;
 
     public static void main(String[] args) throws InterruptedException {
         System.out.println("Warming up...");

@@ -75,14 +75,4 @@ public class IndicatorCalculator {
     public boolean isReady() {
         return slowCount == slowWindow.length;
     }
-
-    /**
-     * Difference between fast and slow SMA.
-     * Positive = fast above slow (bullish), negative = fast below slow (bearish).
-     *
-     * @return fast SMA minus slow SMA.
-     */
-    public double getSpread() {
-        return getFastSMA() - getSlowSMA();
-    }
 }

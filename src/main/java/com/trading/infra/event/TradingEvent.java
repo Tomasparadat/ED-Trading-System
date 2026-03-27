@@ -16,11 +16,6 @@ public class TradingEvent {
     /**
      * Fill TradingEvent with basic information to be published in RingBuffer.
      * Missing attributes like strategyId, orderId and timestamp are added as orders are created & executed.
-     *
-     * @param type MARKET_TICK, ORDER_PROPOSED, ORDER_FILL, ORDER_VALIDATED
-     * @param symbolId Stock ticker symbol
-     * @param price asset price
-     * @param timestamp Time of order execution
      */
     public void set(EventType type, int symbolId, double price, long timestamp) {
         clear();

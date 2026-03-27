@@ -1,6 +1,6 @@
 # Event-Driven Trading System
 
-Event-driven trading system built in Java using LMAX Disruptor. Processes ~74k ticks/second with ~13μs latency/tick. Designed with zero allocation hot paths, GC avoidance and strict separation of strategy, risk and portfolio layers.
+Event-driven trading system built in Java using LMAX Disruptor. Processes ~805k ticks/second with ~1.2μs latency/tick. Avoided hot path allocation and maintained separation of strategy, risk and portfolio layers.
 
 ---
 ## System Diagram
@@ -9,7 +9,7 @@ Event-driven trading system built in Java using LMAX Disruptor. Processes ~74k t
 
 ## Architecture
 
-The system uses a tri-buffer Disruptor pipeline. Each handler reads from one dedicated ring buffer and writes to the next, so no handler ever publishes back into the buffer it consumes from. Making deadlock structurally impossible.
+The system uses a tri-buffer Disruptor pipeline. Each handler reads from one dedicated ring buffer and writes to the next, so no handler ever publishes back into the buffer it consumes from. Making deadlock less likely.
 
 ```
 MarketSimulator
@@ -87,16 +87,13 @@ _Session using Gaussian Random Walk as Price Generator._
           SESSION REPORT                
 ========================================
 
---- Trade Log (showing last 10 of 70692 fills) ---
-  70683    TSLA   SELL  78.29      10.0     2026-03-25 18:00:17.311
-  70684    BTC    BUY   53.49      10.0     2026-03-25 18:00:17.311
-  70685    AAPL   BUY   88.85      10.0     2026-03-25 18:00:17.311
-  70686    TSLA   BUY   77.92      10.0     2026-03-25 18:00:17.313
-  70687    AAPL   SELL  88.93      10.0     2026-03-25 18:00:17.313
-  70688    BTC    SELL  53.57      10.0     2026-03-25 18:00:17.313
-  70689    ETH    SELL  74.11      10.0     2026-03-25 18:00:17.313
-  70690    DB     SELL  62.33      10.0     2026-03-25 18:00:17.313
-  70691    BTC    BUY   53.63      10.0     2026-03-25 18:00:17.314
+--- Trade Log (showing last 5 of 1026942 fills) ---
+  1026934  ETH    BUY   70.10      10.0     2026-03-27 22:15:29.971
+  1026935  TSLA   SELL  58.84      10.0     2026-03-27 22:15:29.971
+  1026936  ETH    SELL  70.05      10.0     2026-03-27 22:15:29.971
+  1026937  TSLA   BUY   58.86      10.0     2026-03-27 22:15:29.971
+  1026938  BTC    SELL  119.53     10.0     2026-03-27 22:15:29.971
+ 
 
 --- Final Positions ---
   BTC    | qty:    10.00
@@ -106,24 +103,24 @@ _Session using Gaussian Random Walk as Price Generator._
   DB     | qty:     0.00
 
 --- Realized PnL by Symbol ---
-  BTC    | pnl:    -209.01
-  ETH    | pnl:     -41.82
-  AAPL   | pnl:     +85.91
-  TSLA   | pnl:     -92.15
-  DB     | pnl:    -244.37
+  BTC    | pnl:    +197.22
+  ETH    | pnl:    +153.32
+  AAPL   | pnl:    -424.04
+  TSLA   | pnl:    -150.37
+  DB     | pnl:      +0.00
 
 --- Total ---
-  Total Ticks: 1116605
-  Total Fills: 70692
-  Fill Rate: 6.3310%
-  Total Realized PnL: -501.44
+  Total Ticks: 16154496
+  Total Fills: 1026942
+  Fill Rate: 6.3570%
+  Total Realized PnL: -223.87
 ========================================
 
 ==========================================
-  Ticks processed:    1,116,605
-  Fills executed:      70,692
-  Ticks/second:        74,439
-  Avg latency/tick:    13.434 µs
+  Ticks processed:    16,154,496
+  Fills executed:      1,026,942
+  Ticks/second:        807,716
+  Avg latency/tick:    1.238 µs
 ==========================================
 ```
 

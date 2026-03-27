@@ -11,18 +11,7 @@ import com.trading.strategy.*;
 
 import java.util.List;
 
-/**
- * Single point of construction, configuration, and lifecycle management
- * for the entire trading system.
- *
- * All tunable parameters are defined as constants at the top of this class.
- * To change symbols, strategy periods, risk limits, or tick speed,
- * this is the only file that needs to be modified.
- *
- * Construction order is strictly linear to resolve dependencies:
- * Registry -> Portfolio -> Strategy -> OrderMatcher -> Risk -> Handlers
- * -> Disruptor (init) -> MarketSimulator -> Disruptor (start)
- */
+
 public class SystemController {
     private static final List<String> SYMBOLS = List.of("BTC", "ETH", "AAPL", "TSLA", "DB");
     private static final int SMA_FAST_PERIOD = 5;
@@ -30,43 +19,22 @@ public class SystemController {
     private static final double MAX_POSITION_SIZE = 1000.0;
     private static final double MAX_DAILY_LOSS = 10000.0;
     private static final double MAX_PRICE_DEV_PCT = 0.05;
-    private static final int TICK_INTERVAL_MS = 2;
+    private static final int TICK_INTERVAL_MS = 0;
 
     private final MultiBufferDisruptorManager disruptorManager;
     private final MarketSimulator marketSimulator;
     private final PortfolioTracker portfolio;
     private final SymbolRegistry registry;
+    private final OrderMatcher orderMatcher;
+    private final StrategyEngine strategyEngine;
 
-    /**
-     * Constructs and fully wires the trading system.
-     * All components are built in dependency order and injected explicitly —
-     * no component constructs its own dependencies internally.
-     *
-     * Construction sequence:
-     * <ol>
-     *   <li>SymbolRegistry — assigns integer IDs to ticker symbols.</li>
-     *   <li>PortfolioTracker — tracks positions and realized PnL.</li>
-     *   <li>StrategyEngine — one SMA indicator pair per symbol.</li>
-     *   <li>OrderMatcher — maintains the order book and last known prices.</li>
-     *   <li>RiskManager — validates orders against position, drawdown, and price rules.</li>
-     *   <li>Handlers — one per pipeline stage, each filtering on its target event type.</li>
-     *   <li>DisruptorManager.init() — builds the Disruptor and allocates the ring buffer.</li>
-     *   <li>MarketSimulator — receives EventProducer to publish ticks into the ring buffer.</li>
-     *   <li>DisruptorManager.start() — registers handlers in pipeline order and starts processing.</li>
-     * </ol>
-     */
+
     public SystemController() {
-        SymbolRegistry registry = new SymbolRegistry(SYMBOLS);
-        PortfolioTracker portfolio = new PortfolioTracker(registry.size());
-        this.registry = registry;
-        this.portfolio = portfolio;
+        this.registry = new SymbolRegistry(SYMBOLS);
+        this.portfolio = new PortfolioTracker(registry.size());
 
-        StrategyEngine strategyEngine = new StrategyEngine(
-                SMA_FAST_PERIOD, SMA_SLOW_PERIOD, registry.size()
-        );
-
-        OrderMatcher orderMatcher = new OrderMatcher(registry);
-
+        this.strategyEngine = new StrategyEngine(SMA_FAST_PERIOD, SMA_SLOW_PERIOD, registry.size());
+        this.orderMatcher = new OrderMatcher(registry);
         RiskManager riskManager = new RiskManager(
                 portfolio,
                 orderMatcher.getLastKnownPrices(),
@@ -75,23 +43,21 @@ public class SystemController {
                 MAX_PRICE_DEV_PCT
         );
 
-        PortfolioHandler portfolioHandler = new PortfolioHandler(portfolio);
-        DbLoggerHandler dbLoggerHandler  = new DbLoggerHandler(registry);
-
-        disruptorManager = new MultiBufferDisruptorManager(
-                registry, null, null, portfolioHandler, dbLoggerHandler);
+        this.disruptorManager = new MultiBufferDisruptorManager(registry);
         disruptorManager.init();
 
         EventProducer tickProducer = disruptorManager.getTickProducer();
         EventProducer orderProducer = disruptorManager.getOrderProducer();
         EventProducer fillProducer = disruptorManager.getFillProducer();
 
-        StrategyHandler strategyHandler  = new StrategyHandler(strategyEngine, orderProducer);
         RiskHandler riskHandler = new RiskHandler(riskManager, fillProducer);
+        StrategyHandler strategyHandler = new StrategyHandler(strategyEngine, orderProducer);
+        PortfolioHandler portfolioHandler = new PortfolioHandler(portfolio);
+        DbLoggerHandler dbLoggerHandler = new DbLoggerHandler(registry);
 
-        this.marketSimulator = new MarketSimulator(tickProducer, registry, orderMatcher, TICK_INTERVAL_MS);
+        this.marketSimulator = new MarketSimulator(tickProducer, registry);
 
-        disruptorManager.start(marketSimulator, strategyHandler, riskHandler);
+        disruptorManager.start(strategyHandler, riskHandler, orderMatcher ,portfolioHandler, dbLoggerHandler);
     }
 
     public void start() {
@@ -101,19 +67,12 @@ public class SystemController {
     /**
      * Stops the market simulation loop and shuts down the Disruptor.
      * The simulation thread will finish its current tick before stopping.
-     * Should be called on application shutdown, typically via a shutdown hook.
      */
     public void stop() {
         marketSimulator.stop();
         disruptorManager.shutdown();
 
-        new CsvExporter(
-                portfolio.getLedger(),
-                registry,
-                "trades_" + System.currentTimeMillis() + ".csv"
-        ).export();
-
-
+        new CsvExporter(portfolio.getLedger(), registry, "trades_" + System.currentTimeMillis() + ".csv").export();
         new SessionReport(portfolio, registry, marketSimulator.getTickCount()).print();
     }
 
