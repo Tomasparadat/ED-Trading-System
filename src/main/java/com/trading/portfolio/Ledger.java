@@ -13,7 +13,8 @@ import java.util.List;
  * caused by the Disruptor reusing ring buffer slots.
  */
 public class Ledger {
-    private final List<LedgerRecord> tradeHistory = new ArrayList<>(1_000_000);
+   private final List<LedgerRecord> tradeHistory = new ArrayList<>(1_000_000);
+
 
     /**
      * Records a TradingEvent into the trade history as an immutable LedgerRecord.

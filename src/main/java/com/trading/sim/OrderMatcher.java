@@ -53,10 +53,9 @@ public class OrderMatcher implements EventHandler<TradingEvent> {
     }
 
     /**
-     * Mutates the TradingEvent in place, transforming it from a MARKET_TICK
-     * into an ORDER_FILL with the matched order's attributes.
+     * Mutates the TradingEvent in place,
      *
-     * @param event TradingEvent to mutate.
+     * @param event TradingEvent.
      * @param order Matched OpenOrder whose values are applied to the event.
      */
     private void applyFill(TradingEvent event, OpenOrder order) {
@@ -69,8 +68,6 @@ public class OrderMatcher implements EventHandler<TradingEvent> {
 
     /**
      * Determines whether a resting order can be filled at the current market price.
-     * A BUY order matches when the market price is at or below the order price.
-     * A SELL order matches when the market price is at or above the order price.
      *
      * @param order The resting OpenOrder to evaluate.
      * @param marketPrice The current market price of the underlying asset.
@@ -82,8 +79,6 @@ public class OrderMatcher implements EventHandler<TradingEvent> {
 
     /**
      * Persists an incoming NEW_ORDER event as an OpenOrder record in the order book.
-     * Copying into an immutable record prevents data loss when the ring buffer
-     * recycles the TradingEvent slot.
      *
      * @param event The NEW_ORDER TradingEvent to persist.
      */
@@ -101,7 +96,6 @@ public class OrderMatcher implements EventHandler<TradingEvent> {
     /**
      * Returns the last known market price array, shared with OrderChecker
      * for price deviation validation in the risk layer.
-     * Updated on every MARKET_TICK.
      *
      * @return Array of last known prices indexed by symbolId.
      */

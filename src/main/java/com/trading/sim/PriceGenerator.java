@@ -35,4 +35,5 @@ public class PriceGenerator {
         priceList[symbolId] = newPrice;
         return newPrice;
     }
+
 }

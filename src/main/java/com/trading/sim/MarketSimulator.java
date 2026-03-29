@@ -1,13 +1,6 @@
 package com.trading.sim;
 
-import com.trading.infra.event.TradingEvent;
-import java.util.concurrent.locks.LockSupport;
 
-/**
- * REFACTORED: MarketSimulator is now a PURE Producer.
- * It is NOT an EventHandler. Order matching should be a separate handler
- * downstream in the Disruptor pipeline.
- */
 public class MarketSimulator implements Runnable {
     private final EventProducer producer;
     private final PriceGenerator priceGenerator;

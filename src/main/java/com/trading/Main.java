@@ -10,7 +10,7 @@ public class Main {
         systemController.start();
 
         // Trading System execution time.
-        Thread.sleep(10_000);
+        Thread.sleep(30_000);
 
         systemController.stop();
     }

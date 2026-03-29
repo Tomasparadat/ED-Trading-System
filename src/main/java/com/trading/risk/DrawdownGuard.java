@@ -14,7 +14,7 @@ public class DrawdownGuard implements RiskRule{
     /**
      * Rejects the order if total realized PnL has fallen below the max daily loss threshold.
      *
-     * @param order The ORDER_PROPOSED event being evaluated (not used directly, limit is portfolio-level).
+     * @param order The ORDER_PROPOSED event being evaluated.
      * @param pt PortfolioTracker providing the current total realized PnL.
      * @return REJECTED_DRAWDOWN_HALT if the loss limit is surpassed, PASSED otherwise.
      */

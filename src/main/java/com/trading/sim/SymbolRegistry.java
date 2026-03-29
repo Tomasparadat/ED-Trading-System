@@ -5,9 +5,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.stream.IntStream;
 
-/**
- * High-performance, immutable registry that maps Ticker Strings to unique Integer IDs.
- */
+
 public class SymbolRegistry {
     private final String[] symbols;
     private final Map<String, Integer> hashIdMap;
@@ -32,7 +30,7 @@ public class SymbolRegistry {
     /**
      * Translates a Ticker String to its internal Integer ID using the HashMap.
      *
-     * @param symbol Ticker string (e.g. "BTC").
+     * @param symbol Ticker string.
      * @return The unique int ID, or -1 if not found.
      */
     public int getSymbolId(String symbol) {
@@ -43,7 +41,7 @@ public class SymbolRegistry {
      * Translates an internal Integer ID back to its Ticker String.
      *
      * @param symbolId Internal integer ID.
-     * @return The Ticker String (e.g. "BTC").
+     * @return The Ticker String.
      * @throws ArrayIndexOutOfBoundsException if symbolId is out of range.
      */
     public String getSymbolName(int symbolId) {
@@ -60,7 +58,7 @@ public class SymbolRegistry {
     }
 
     /**
-     * Returns a stream of all valid symbol IDs (0 to N-1).
+     * Returns a stream of all valid symbol IDs.
      *
      * @return IntStream of all symbol IDs.
      */
