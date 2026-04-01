@@ -3,6 +3,7 @@ package com.trading;
 
 import com.trading.infra.controller.SystemController;
 
+
 public class Main {
 
     public static void main(String[] args) throws InterruptedException {

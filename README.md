@@ -1,6 +1,6 @@
 # Event-Driven Trading System
 
-Event-driven trading system built in Java using LMAX Disruptor. Processes ~805k ticks/second with ~1.2μs latency/tick. Avoided hot path allocation and maintained separation of strategy, risk and portfolio layers.
+Event-driven trading system built in Java using LMAX Disruptor. Processes ~807k ticks/second with ~1.2μs latency/tick. System avoids hot path allocation and maintains separation of strategy, risk and portfolio layers.
 
 ---
 ## System Diagram
@@ -9,7 +9,7 @@ Event-driven trading system built in Java using LMAX Disruptor. Processes ~805k 
 
 ## Architecture
 
-The system uses a tri-buffer Disruptor pipeline. Each handler reads from one dedicated ring buffer and writes to the next, so no handler ever publishes back into the buffer it consumes from. Making deadlock less likely.
+Market Ticks are generated with MarketSimulator on an isolated thread that publishes events to a tri-buffer Disruptor pipeline. Each handler reads from one dedicated ring buffer and writes to the next, so no handler ever publishes back into the buffer it consumes from. Making deadlock less likely.
 
 ```
 MarketSimulator
@@ -48,19 +48,19 @@ _Session using Gaussian Random Walk as Price Generator._
 - In-memory order matching using pre-allocated structures.
 
 ### Strategy
-- SMA crossover engine with O(1) updates via circular buffers
+- SMA crossover function with O(1) updates via circular buffers.
 - Signal generation triggered only on crossover events.
 
 ### Risk
-- Rule-based validation (position limit, price deviation, drawdown guard)
+- Rule-based validation (position limit, price deviation, drawdown guard).
 - Fail-fast evaluation pipeline.
 
 ### Portfolio
-- Real-time position tracking and PnL computation.
+- Real-time position tracking and PnL calculation.
 - Array based storage.
 
 ### Infrastructure
-- Multi-buffer Disruptor pipeline orchestration (See Architecture).
+- Multi-buffer Disruptor pipeline.
 - Benchmarking + CSV export for analysis.
 
 ---
